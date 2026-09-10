@@ -22,16 +22,23 @@ export const Navbar: React.FC<NavbarProps> = ({
         {/* Brand Logo */}
         <div
           onClick={() => onNavigate('#/')}
-          className="flex items-center gap-2.5 cursor-pointer select-none group shrink-0"
+          className="flex items-center gap-3 cursor-pointer select-none group shrink-0"
         >
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 text-white flex items-center justify-center font-black text-base shadow-sm shadow-indigo-200 group-hover:scale-105 transition-transform">
-            m
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-700 via-amber-600 to-amber-500 text-white flex items-center justify-center font-black text-base shadow-sm shadow-amber-200 group-hover:scale-105 transition-transform">
+            H
           </div>
-          <div className="flex items-baseline gap-1">
-            <span className="font-black text-slate-900 text-lg tracking-tight">
-              mycommerce
+          <div className="flex flex-col">
+            <div className="flex items-center gap-1.5 leading-none">
+              <span className="font-black text-slate-900 text-lg tracking-tight">
+                Hiljhil
+              </span>
+              <span className="text-[10px] uppercase font-bold tracking-widest px-1.5 py-0.5 rounded bg-amber-100 text-amber-800">
+                Cafe
+              </span>
+            </div>
+            <span className="text-[10px] text-slate-400 font-medium tracking-tight">
+              hiljhil.cafe
             </span>
-            <span className="w-1.5 h-1.5 rounded-full bg-indigo-600" />
           </div>
         </div>
 
@@ -42,24 +49,24 @@ export const Navbar: React.FC<NavbarProps> = ({
             onClick={() => onNavigate('#/')}
             className={`text-xs font-bold flex items-center gap-1.5 transition-colors ${
               currentRoute === '#/' || currentRoute === ''
-                ? 'text-indigo-600'
+                ? 'text-amber-700 font-extrabold'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
             <Home className="w-3.5 h-3.5" />
-            Home
+            Cafe Flagship
           </button>
           <button
             type="button"
             onClick={() => onNavigate('#/collection')}
             className={`text-xs font-bold flex items-center gap-1.5 transition-colors ${
               currentRoute.startsWith('#/collection')
-                ? 'text-indigo-600'
+                ? 'text-amber-700 font-extrabold'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
             <Grid className="w-3.5 h-3.5" />
-            Collection
+            Roastery & Store
           </button>
         </nav>
 
