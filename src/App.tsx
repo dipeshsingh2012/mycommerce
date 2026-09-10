@@ -178,18 +178,20 @@ export const App: React.FC = () => {
                       Verify Countertop Fitment with Computer Vision
                     </h3>
                   </div>
-                  <Suspense fallback={<MfeLoadingPlaceholder name="Counter-Check Widget" />}>
-                    <CounterCheckWidget
-                      productId={product.id}
-                      productName={product.name}
-                      productHeightCm={product.height_cm}
-                      productTopClearanceCm={product.top_clearance_cm}
-                      onSelectAlternative={(altId: string) => {
-                        setActiveProductId(altId);
-                        navigate(`#/product/${altId}`);
-                      }}
-                    />
-                  </Suspense>
+                  <MfeErrorBoundary fragmentName="CounterCheckWidget">
+                    <Suspense fallback={<MfeLoadingPlaceholder name="Counter-Check Widget" />}>
+                      <CounterCheckWidget
+                        productId={product.id}
+                        productName={product.name}
+                        productHeightCm={product.height_cm}
+                        productTopClearanceCm={product.top_clearance_cm}
+                        onSelectAlternative={(altId: string) => {
+                          setActiveProductId(altId);
+                          navigate(`#/product/${altId}`);
+                        }}
+                      />
+                    </Suspense>
+                  </MfeErrorBoundary>
                 </div>
               )}
             />
@@ -294,22 +296,26 @@ export const App: React.FC = () => {
       )}
 
       {/* Global Instant Search Modal (Federated Remote) */}
-      <Suspense fallback={null}>
-        <SearchModal
-          isOpen={isSearchModalOpen}
-          onClose={() => setIsSearchModalOpen(false)}
-          initialClearance={activeClearanceFilter}
-          onSelectProduct={(product: any) => {
-            setActiveProductId(product.id);
-            navigate(`#/product/${product.id}`);
-          }}
-          onFullSearch={(query: string, maxHeight?: number | null) => {
-            if (maxHeight !== undefined) setActiveClearanceFilter(maxHeight);
-            const qParam = query ? `?q=${encodeURIComponent(query)}` : '';
-            navigate(`#/search${qParam}`);
-          }}
-        />
-      </Suspense>
+      {isSearchModalOpen && (
+        <MfeErrorBoundary fragmentName="SearchModal">
+          <Suspense fallback={null}>
+            <SearchModal
+              isOpen={isSearchModalOpen}
+              onClose={() => setIsSearchModalOpen(false)}
+              initialClearance={activeClearanceFilter}
+              onSelectProduct={(product: any) => {
+                setActiveProductId(product.id);
+                navigate(`#/product/${product.id}`);
+              }}
+              onFullSearch={(query: string, maxHeight?: number | null) => {
+                if (maxHeight !== undefined) setActiveClearanceFilter(maxHeight);
+                const qParam = query ? `?q=${encodeURIComponent(query)}` : '';
+                navigate(`#/search${qParam}`);
+              }}
+            />
+          </Suspense>
+        </MfeErrorBoundary>
+      )}
 
       {/* Global Footer */}
       <Footer />

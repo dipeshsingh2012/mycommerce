@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "vite --port 5170",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "start:remotes": "node scripts/start-remotes.mjs",
+    "start:all": "node scripts/start-all.mjs"
   },
   "dependencies": {
     "clsx": "^2.1.1",
