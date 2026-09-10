@@ -1,14 +1,41 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
-import { HomepageFragment } from '@mycommerce/homepage-ui';
-import { DiscoveryFragment } from '@mycommerce/discovery-ui';
-import { ProductPageFragment, ProductDetail } from '@mycommerce/product-page-ui';
-import { CartFragment } from '@mycommerce/cart-ui';
-import { CheckoutFragment, OrderReceipt } from '@mycommerce/checkout-ui';
-import { CounterCheckWidget } from '@mycommerce/counter-check';
-import { SearchFragment, SearchModal, SearchProduct } from '@mycommerce/search-ui';
+import { MfeErrorBoundary } from './components/MfeErrorBoundary';
 import { CheckCircle2, X, ShoppingBag } from 'lucide-react';
+
+// Dynamic Module Federation Lazy Imports
+const HomepageFragment = lazy(() =>
+  import('homepageUi/HomepageFragment').then((m) => ({ default: m.HomepageFragment || m.default }))
+);
+const DiscoveryFragment = lazy(() =>
+  import('discoveryUi/DiscoveryFragment').then((m) => ({ default: m.DiscoveryFragment || m.default }))
+);
+const ProductPageFragment = lazy(() =>
+  import('productPageUi/ProductPageFragment').then((m) => ({ default: m.ProductPageFragment || m.default }))
+);
+const CounterCheckWidget = lazy(() =>
+  import('counterCheck/CounterCheckWidget').then((m) => ({ default: m.CounterCheckWidget || m.default }))
+);
+const CartFragment = lazy(() =>
+  import('cartUi/CartFragment').then((m) => ({ default: m.CartFragment || m.default }))
+);
+const CheckoutFragment = lazy(() =>
+  import('checkoutUi/CheckoutFragment').then((m) => ({ default: m.CheckoutFragment || m.default }))
+);
+const SearchModal = lazy(() =>
+  import('searchUi/SearchModal').then((m) => ({ default: m.SearchModal || m.default }))
+);
+const SearchFragment = lazy(() =>
+  import('searchUi/SearchFragment').then((m) => ({ default: m.SearchFragment || m.default }))
+);
+
+const MfeLoadingPlaceholder: React.FC<{ name: string }> = ({ name }) => (
+  <div className="py-24 text-center space-y-3">
+    <div className="w-8 h-8 border-3 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto" />
+    <p className="text-xs font-semibold text-slate-500">Loading {name} fragment via Module Federation...</p>
+  </div>
+);
 
 export const App: React.FC = () => {
   const [currentRoute, setCurrentRoute] = useState<string>(() => window.location.hash || '#/');
@@ -64,33 +91,41 @@ export const App: React.FC = () => {
   const renderRouteFragment = () => {
     if (currentRoute === '#/' || currentRoute === '' || currentRoute === '#') {
       return (
-        <HomepageFragment
-          onCategorySelect={(catSlug) => {
-            setActiveCategory(catSlug);
-            navigate('#/collection');
-          }}
-          onClearanceSelect={(clearanceCm) => {
-            setActiveClearanceFilter(clearanceCm);
-            navigate('#/collection');
-            showToast(`Applied clearance filter: ≤ ${clearanceCm} cm`, 'View Collection', '#/collection');
-          }}
-        />
+        <MfeErrorBoundary fragmentName="HomepageFragment">
+          <Suspense fallback={<MfeLoadingPlaceholder name="Homepage" />}>
+            <HomepageFragment
+              onCategorySelect={(catSlug: string) => {
+                setActiveCategory(catSlug);
+                navigate('#/collection');
+              }}
+              onClearanceSelect={(clearanceCm: number) => {
+                setActiveClearanceFilter(clearanceCm);
+                navigate('#/collection');
+                showToast(`Applied clearance filter: ≤ ${clearanceCm} cm`, 'View Collection', '#/collection');
+              }}
+            />
+          </Suspense>
+        </MfeErrorBoundary>
       );
     }
 
     if (currentRoute.startsWith('#/collection')) {
       return (
-        <DiscoveryFragment
-          initialCategory={activeCategory}
-          initialMaxHeight={activeClearanceFilter}
-          onClearanceFilterChange={(cm) => {
-            setActiveClearanceFilter(cm);
-          }}
-          onProductSelect={(product) => {
-            setActiveProductId(product.id);
-            navigate(`#/product/${product.id}`);
-          }}
-        />
+        <MfeErrorBoundary fragmentName="DiscoveryFragment">
+          <Suspense fallback={<MfeLoadingPlaceholder name="Discovery & Collection" />}>
+            <DiscoveryFragment
+              initialCategory={activeCategory}
+              initialMaxHeight={activeClearanceFilter}
+              onClearanceFilterChange={(cm: number | null) => {
+                setActiveClearanceFilter(cm);
+              }}
+              onProductSelect={(product: any) => {
+                setActiveProductId(product.id);
+                navigate(`#/product/${product.id}`);
+              }}
+            />
+          </Suspense>
+        </MfeErrorBoundary>
       );
     }
 
@@ -100,86 +135,104 @@ export const App: React.FC = () => {
       const searchQ = params.get('q') || '';
 
       return (
-        <SearchFragment
-          initialQuery={searchQ}
-          initialMaxHeight={activeClearanceFilter}
-          onClearanceFilterChange={(cm) => {
-            setActiveClearanceFilter(cm);
-          }}
-          onProductSelect={(product: SearchProduct) => {
-            setActiveProductId(product.id);
-            navigate(`#/product/${product.id}`);
-          }}
-          onAddToCart={(product: SearchProduct) => {
-            setCartCount((c) => c + 1);
-            showToast(`Added ${product.name} to cart!`, 'View Cart', '#/cart');
-          }}
-        />
+        <MfeErrorBoundary fragmentName="SearchFragment">
+          <Suspense fallback={<MfeLoadingPlaceholder name="Search Results" />}>
+            <SearchFragment
+              initialQuery={searchQ}
+              initialMaxHeight={activeClearanceFilter}
+              onClearanceFilterChange={(cm: number | null) => {
+                setActiveClearanceFilter(cm);
+              }}
+              onProductSelect={(product: any) => {
+                setActiveProductId(product.id);
+                navigate(`#/product/${product.id}`);
+              }}
+              onAddToCart={(product: any) => {
+                setCartCount((c) => c + 1);
+                showToast(`Added ${product.name} to cart!`, 'View Cart', '#/cart');
+              }}
+            />
+          </Suspense>
+        </MfeErrorBoundary>
       );
     }
 
     if (currentRoute.startsWith('#/product/')) {
       const prodId = currentRoute.replace('#/product/', '') || activeProductId;
       return (
-        <ProductPageFragment
-          productId={prodId}
-          onAddToCart={(product: ProductDetail) => {
-            setCartCount((c) => c + 1);
-            showToast(`Added ${product.name} to cart!`, 'View Cart', '#/cart');
-          }}
-          renderCounterCheckSlot={(product: ProductDetail) => (
-            <div className="mt-8 pt-6 border-t border-slate-200">
-              <div className="mb-4">
-                <span className="text-xs font-black uppercase tracking-wider text-indigo-600">
-                  Spatial AI Verification Fragment
-                </span>
-                <h3 className="text-lg font-bold text-slate-900 mt-0.5">
-                  Verify Countertop Fitment with Computer Vision
-                </h3>
-              </div>
-              <CounterCheckWidget
-                productId={product.id}
-                productName={product.name}
-                productHeightCm={product.height_cm}
-                productTopClearanceCm={product.top_clearance_cm}
-                onSelectAlternative={(altId) => {
-                  setActiveProductId(altId);
-                  navigate(`#/product/${altId}`);
-                }}
-              />
-            </div>
-          )}
-        />
+        <MfeErrorBoundary fragmentName="ProductPageFragment">
+          <Suspense fallback={<MfeLoadingPlaceholder name="Product Details" />}>
+            <ProductPageFragment
+              productId={prodId}
+              onAddToCart={(product: any) => {
+                setCartCount((c) => c + 1);
+                showToast(`Added ${product.name} to cart!`, 'View Cart', '#/cart');
+              }}
+              renderCounterCheckSlot={(product: any) => (
+                <div className="mt-8 pt-6 border-t border-slate-200">
+                  <div className="mb-4">
+                    <span className="text-xs font-black uppercase tracking-wider text-indigo-600">
+                      Spatial AI Verification Fragment
+                    </span>
+                    <h3 className="text-lg font-bold text-slate-900 mt-0.5">
+                      Verify Countertop Fitment with Computer Vision
+                    </h3>
+                  </div>
+                  <Suspense fallback={<MfeLoadingPlaceholder name="Counter-Check Widget" />}>
+                    <CounterCheckWidget
+                      productId={product.id}
+                      productName={product.name}
+                      productHeightCm={product.height_cm}
+                      productTopClearanceCm={product.top_clearance_cm}
+                      onSelectAlternative={(altId: string) => {
+                        setActiveProductId(altId);
+                        navigate(`#/product/${altId}`);
+                      }}
+                    />
+                  </Suspense>
+                </div>
+              )}
+            />
+          </Suspense>
+        </MfeErrorBoundary>
       );
     }
 
     if (currentRoute === '#/cart') {
       return (
-        <CartFragment
-          cartId="cart_active_session"
-          onVerifyFitmentClick={(productId) => {
-            setActiveProductId(productId);
-            navigate(`#/product/${productId}`);
-          }}
-          onProceedToCheckout={() => {
-            navigate('#/checkout');
-          }}
-        />
+        <MfeErrorBoundary fragmentName="CartFragment">
+          <Suspense fallback={<MfeLoadingPlaceholder name="Shopping Cart" />}>
+            <CartFragment
+              cartId="cart_active_session"
+              onVerifyFitmentClick={(productId: string) => {
+                setActiveProductId(productId);
+                navigate(`#/product/${productId}`);
+              }}
+              onProceedToCheckout={() => {
+                navigate('#/checkout');
+              }}
+            />
+          </Suspense>
+        </MfeErrorBoundary>
       );
     }
 
     if (currentRoute === '#/checkout') {
       return (
-        <CheckoutFragment
-          cartId="cart_active_session"
-          onOrderComplete={(receipt: OrderReceipt) => {
-            setCartCount(0);
-            showToast(`Order ${receipt.order_number} confirmed with White-Glove delivery!`);
-          }}
-          onReturnToShopping={() => {
-            navigate('#/collection');
-          }}
-        />
+        <MfeErrorBoundary fragmentName="CheckoutFragment">
+          <Suspense fallback={<MfeLoadingPlaceholder name="Checkout" />}>
+            <CheckoutFragment
+              cartId="cart_active_session"
+              onOrderComplete={(receipt: any) => {
+                setCartCount(0);
+                showToast(`Order ${receipt.order_number} confirmed with White-Glove delivery!`);
+              }}
+              onReturnToShopping={() => {
+                navigate('#/collection');
+              }}
+            />
+          </Suspense>
+        </MfeErrorBoundary>
       );
     }
 
@@ -240,21 +293,23 @@ export const App: React.FC = () => {
         </div>
       )}
 
-      {/* Global Instant Search Modal (Triggered by ⌘K or Navbar Search) */}
-      <SearchModal
-        isOpen={isSearchModalOpen}
-        onClose={() => setIsSearchModalOpen(false)}
-        initialClearance={activeClearanceFilter}
-        onSelectProduct={(product: SearchProduct) => {
-          setActiveProductId(product.id);
-          navigate(`#/product/${product.id}`);
-        }}
-        onFullSearch={(query: string, maxHeight?: number | null) => {
-          if (maxHeight !== undefined) setActiveClearanceFilter(maxHeight);
-          const qParam = query ? `?q=${encodeURIComponent(query)}` : '';
-          navigate(`#/search${qParam}`);
-        }}
-      />
+      {/* Global Instant Search Modal (Federated Remote) */}
+      <Suspense fallback={null}>
+        <SearchModal
+          isOpen={isSearchModalOpen}
+          onClose={() => setIsSearchModalOpen(false)}
+          initialClearance={activeClearanceFilter}
+          onSelectProduct={(product: any) => {
+            setActiveProductId(product.id);
+            navigate(`#/product/${product.id}`);
+          }}
+          onFullSearch={(query: string, maxHeight?: number | null) => {
+            if (maxHeight !== undefined) setActiveClearanceFilter(maxHeight);
+            const qParam = query ? `?q=${encodeURIComponent(query)}` : '';
+            navigate(`#/search${qParam}`);
+          }}
+        />
+      </Suspense>
 
       {/* Global Footer */}
       <Footer />

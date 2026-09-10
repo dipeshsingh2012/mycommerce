@@ -14,17 +14,7 @@
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true,
-    "baseUrl": ".",
-    "paths": {
-      "@mycommerce/counter-check": ["../counter-check/src/index.ts"],
-      "@mycommerce/homepage-ui": ["../homepage-ui/src/index.ts"],
-      "@mycommerce/discovery-ui": ["../discovery-ui/src/index.ts"],
-      "@mycommerce/product-page-ui": ["../product-page-ui/src/index.ts"],
-      "@mycommerce/cart-ui": ["../cart-ui/src/index.ts"],
-      "@mycommerce/checkout-ui": ["../checkout-ui/src/index.ts"],
-      "@mycommerce/search-ui": ["../search-ui/src/index.ts"]
-    }
+    "noFallthroughCasesInSwitch": true
   },
   "include": ["src"],
   "references": [{ "path": "./tsconfig.node.json" }]
