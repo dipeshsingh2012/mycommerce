@@ -1,6 +1,13 @@
 import { spawn } from 'node:child_process';
+import fs from 'node:fs';
 
-const pythonBin = '/home/dipes/projects/fleet-cortex/.venv/bin/python';
+const resolvePython = (serviceDir) => {
+  const localVenv = `${serviceDir}/.venv/bin/python`;
+  if (fs.existsSync(localVenv)) {
+    return localVenv;
+  }
+  return 'python3';
+};
 
 const services = [
   { name: 'counter-check-service', port: 8000, dir: '/home/dipes/projects/counter-check-service' },
@@ -14,6 +21,7 @@ const services = [
 const children = [];
 
 for (const s of services) {
+  const pythonBin = resolvePython(s.dir);
   const child = spawn(
     pythonBin,
     ['-m', 'uvicorn', 'src.main:app', '--host', '0.0.0.0', '--port', String(s.port)],
