@@ -12,7 +12,7 @@
     "start:backend": "node scripts/start-backend.mjs"
   },
   "dependencies": {
-    "@dipesh.singh/commerce-ui": "^0.1.1",
+    "@dipesh.singh/commerce-ui": "^0.1.10",
     "@dipesh.singh/proton": "^0.1.0",
     "clsx": "^2.1.1",
     "lucide-react": "^0.363.0",

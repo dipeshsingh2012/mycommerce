@@ -91,3 +91,4 @@ export const LegalPage: React.FC<LegalPageProps> = ({ type }) => {
     </div>
   );
 };
+

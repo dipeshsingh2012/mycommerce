@@ -1,5 +1,5 @@
 import React, { useState, useEffect, Suspense, lazy } from 'react';
-import { ProtonThemeProvider, ProtonSpinner } from '@dipesh.singh/proton/react';
+import { ProtonThemeProvider } from '@dipesh.singh/proton/react';
 import { PromoBar, NavigationHeader, Footer as StoreFooter, NavLinkItem } from '@dipesh.singh/commerce-ui';
 import { MfeErrorBoundary } from './components/MfeErrorBoundary';
 import { CheckCircle2, X, ShoppingBag } from 'lucide-react';
@@ -63,8 +63,9 @@ const SearchFragment = lazy(() =>
 );
 
 const MfeLoadingPlaceholder: React.FC<{ name: string }> = ({ name }) => (
-  <div className="py-24 flex flex-col items-center justify-center space-y-3">
-    <ProtonSpinner size="md" variant="amber" label={`Loading ${name} fragment via Module Federation...`} />
+  <div className="py-24 flex flex-col items-center justify-center space-y-3" role="status" aria-label={`Loading ${name} fragment`}>
+    <div className="w-8 h-8 border-3 border-amber-600 border-t-transparent rounded-full animate-spin" />
+    <p className="text-xs font-semibold text-slate-500">Loading {name} fragment via Module Federation...</p>
   </div>
 );
 
