@@ -1,9 +1,13 @@
 import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { ProtonThemeProvider, ProtonSpinner } from '@dipesh.singh/proton/react';
-import { Navbar } from './components/Navbar';
-import { Footer } from './components/Footer';
+import { PromoBar, NavigationHeader, Footer as StoreFooter, NavLinkItem } from '@dipesh.singh/commerce-ui';
 import { MfeErrorBoundary } from './components/MfeErrorBoundary';
 import { CheckCircle2, X, ShoppingBag } from 'lucide-react';
+import { SubscriptionsPage } from './pages/SubscriptionsPage';
+import { CafesPage } from './pages/CafesPage';
+import { AboutPage } from './pages/AboutPage';
+import { OffersPage } from './pages/OffersPage';
+import { LegalPage } from './pages/LegalPage';
 
 // Resilient Federated Component Resolver
 function resolveFederatedComponent<T extends React.ComponentType<any>>(
@@ -63,6 +67,48 @@ const MfeLoadingPlaceholder: React.FC<{ name: string }> = ({ name }) => (
     <ProtonSpinner size="md" variant="amber" label={`Loading ${name} fragment via Module Federation...`} />
   </div>
 );
+
+const STORE_NAV_LINKS: NavLinkItem[] = [
+  {
+    id: 'coffees',
+    label: 'Coffees',
+    href: '#/coffees',
+    subItems: [
+      { id: 'roasted', label: 'Roasted & Ground Beans', href: '#/coffees', description: 'Single-origin estates & signature blends', badge: 'Popular' },
+      { id: 'easy-pour', label: 'Easy Pour & Drip Bags', href: '#/coffees', description: 'Fresh pour over coffee in 3 easy steps' },
+      { id: 'concentrates', label: 'Specialty Cold Brew Drops', href: '#/coffees', description: 'Stir & sip iced coffee concentrate', badge: 'NEW' },
+      { id: 'bundles', label: 'Tasting & Explorer Bundles', href: '#/offers', description: 'Curated roasts for every palate' },
+    ],
+  },
+  {
+    id: 'equipment',
+    label: 'Equipment',
+    href: '#/equipment',
+    subItems: [
+      { id: 'espresso', label: 'Espresso Machines', href: '#/equipment', description: 'Breville, Gaggia, and home barista machines' },
+      { id: 'grinders', label: 'Precision Burr Grinders', href: '#/equipment', description: 'Electric and manual burr grinders' },
+      { id: 'pour-over', label: 'Pour Over & Drippers', href: '#/equipment', description: 'V60, Chemex, and Aeropress gear' },
+      { id: 'drinkware', label: 'Barista Drinkware', href: '#/equipment' },
+    ],
+  },
+  {
+    id: 'subscriptions',
+    label: 'Subscriptions',
+    href: '#/subscriptions',
+  },
+  {
+    id: 'cafes',
+    label: 'Our Cafes',
+    href: '#/cafes',
+  },
+  {
+    id: 'offers',
+    label: 'Offers',
+    href: '#/offers',
+    isHighlight: true,
+    highlightBadge: 'HOT',
+  },
+];
 
 export const App: React.FC = () => {
   const [currentRoute, setCurrentRoute] = useState<string>(() => window.location.hash || '#/');
@@ -127,8 +173,16 @@ export const App: React.FC = () => {
               }}
               onClearanceSelect={(clearanceCm: number) => {
                 setActiveClearanceFilter(clearanceCm);
-                navigate('#/collection');
-                showToast(`Applied clearance filter: ≤ ${clearanceCm} cm`, 'View Collection', '#/collection');
+                navigate('#/equipment');
+                showToast(`Applied clearance filter: ≤ ${clearanceCm} cm`, 'View Equipment', '#/equipment');
+              }}
+              onProductSelect={(prodId: string) => {
+                setActiveProductId(prodId);
+                navigate(`#/product/${prodId}`);
+              }}
+              onAddToCart={(product: any) => {
+                setCartCount((c) => c + 1);
+                showToast(`Added ${product.name} to cart!`, 'View Cart', '#/cart');
               }}
             />
           </Suspense>
@@ -136,12 +190,13 @@ export const App: React.FC = () => {
       );
     }
 
-    if (currentRoute.startsWith('#/collection')) {
+    if (currentRoute.startsWith('#/collection') || currentRoute.startsWith('#/coffees')) {
+      const defaultCat = currentRoute.startsWith('#/coffees') ? 'coffee' : activeCategory;
       return (
         <MfeErrorBoundary fragmentName="DiscoveryFragment">
-          <Suspense fallback={<MfeLoadingPlaceholder name="Discovery & Collection" />}>
+          <Suspense fallback={<MfeLoadingPlaceholder name="Coffees & Collection" />}>
             <DiscoveryFragment
-              initialCategory={activeCategory}
+              initialCategory={defaultCat}
               initialMaxHeight={activeClearanceFilter}
               onClearanceFilterChange={(cm: number | null) => {
                 setActiveClearanceFilter(cm);
@@ -154,6 +209,70 @@ export const App: React.FC = () => {
           </Suspense>
         </MfeErrorBoundary>
       );
+    }
+
+    if (currentRoute.startsWith('#/equipment')) {
+      return (
+        <MfeErrorBoundary fragmentName="DiscoveryFragment">
+          <Suspense fallback={<MfeLoadingPlaceholder name="Brewing Equipment & Machines" />}>
+            <DiscoveryFragment
+              initialCategory="espresso-machine"
+              initialMaxHeight={activeClearanceFilter}
+              onClearanceFilterChange={(cm: number | null) => {
+                setActiveClearanceFilter(cm);
+              }}
+              onProductSelect={(product: any) => {
+                setActiveProductId(product.id);
+                navigate(`#/product/${product.id}`);
+              }}
+            />
+          </Suspense>
+        </MfeErrorBoundary>
+      );
+    }
+
+    if (currentRoute === '#/subscriptions') {
+      return (
+        <SubscriptionsPage
+          onStartSubscription={(plan) => {
+            setCartCount((c) => c + 1);
+            showToast(`Started ${plan.frequency} subscription!`, 'View Cart', '#/cart');
+          }}
+        />
+      );
+    }
+
+    if (currentRoute === '#/cafes') {
+      return (
+        <CafesPage
+          onOrderAhead={(cafeId) => {
+            navigate('#/coffees');
+            showToast(`Order ahead selected for ${cafeId}. Choose your favorite roasts.`);
+          }}
+        />
+      );
+    }
+
+    if (currentRoute === '#/offers') {
+      return (
+        <OffersPage
+          onApplyPromoCode={(code) => {
+            showToast(`Promo discount coupon ${code} applied to your session!`);
+          }}
+        />
+      );
+    }
+
+    if (currentRoute === '#/about') {
+      return <AboutPage />;
+    }
+
+    if (currentRoute === '#/privacy') {
+      return <LegalPage type="privacy" />;
+    }
+
+    if (currentRoute === '#/terms') {
+      return <LegalPage type="terms" />;
     }
 
     if (currentRoute.startsWith('#/search')) {
@@ -284,17 +403,35 @@ export const App: React.FC = () => {
   return (
     <ProtonThemeProvider>
       <div className="min-h-screen bg-slate-50 flex flex-col selection:bg-amber-700 selection:text-white">
-        {/* Global MFE Storefront Header */}
-        <Navbar
-          currentRoute={currentRoute}
-          onNavigate={navigate}
+        {/* Global Promotional Announcement Bar */}
+        <PromoBar
+          message="Get 10% off on your first coffee purchase, use code -"
+          promoCode="COFFEE10"
+          tag="WELCOME"
+          variant="coffee"
+          onCopyCode={(code) => showToast(`Copied promo coupon code: ${code}`)}
+        />
+
+        {/* Global Retail Navigation Header */}
+        <NavigationHeader
+          logo={{
+            text: 'HILJHIL CAFE',
+            tagline: 'Specialty Coffee Roasters',
+            href: '#/',
+          }}
+          links={STORE_NAV_LINKS}
+          ctaPill={{
+            label: 'Subscribe & Save',
+            onClick: () => navigate('#/subscriptions'),
+          }}
           cartCount={cartCount}
-          activeClearanceFilter={activeClearanceFilter}
-          onOpenSearch={() => setIsSearchModalOpen(true)}
+          onSearchClick={() => setIsSearchModalOpen(true)}
+          onAccountClick={() => showToast('Demo Account Profile: Highland District Club Member')}
+          onCartClick={() => navigate('#/cart')}
         />
 
         {/* Main Micro-Frontend Viewport */}
-        <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-6">
+        <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
           {renderRouteFragment()}
         </main>
 
@@ -345,8 +482,15 @@ export const App: React.FC = () => {
           </MfeErrorBoundary>
         )}
 
-        {/* Global Footer */}
-        <Footer />
+        {/* Global Storefront Footer */}
+        <StoreFooter
+          brandName="Hiljhil Cafe & Roastery"
+          privacyPolicyUrl="#/privacy"
+          termsUrl="#/terms"
+          onNewsletterSubmit={(email) => {
+            showToast(`Thank you! ${email} subscribed to our roastery newsletter.`);
+          }}
+        />
       </div>
     </ProtonThemeProvider>
   );
