@@ -3,11 +3,11 @@ import { ProtonThemeProvider } from '@dipesh.singh/proton/react';
 import { PromoBar, NavigationHeader, Footer as StoreFooter, NavLinkItem } from '@dipesh.singh/commerce-ui';
 import { MfeErrorBoundary } from './components/MfeErrorBoundary';
 import { CheckCircle2, X, ShoppingBag } from 'lucide-react';
-import { SubscriptionsPage } from './pages/SubscriptionsPage';
-import { CafesPage } from './pages/CafesPage';
-import { AboutPage } from './pages/AboutPage';
-import { OffersPage } from './pages/OffersPage';
-import { LegalPage } from './pages/LegalPage';
+import { SubscriptionsPage } from './views/SubscriptionsPage';
+import { CafesPage } from './views/CafesPage';
+import { AboutPage } from './views/AboutPage';
+import { OffersPage } from './views/OffersPage';
+import { LegalPage } from './views/LegalPage';
 
 // Resilient Federated Component Resolver
 function resolveFederatedComponent<T extends React.ComponentType<any>>(

@@ -1,7 +1,10 @@
 node_modules
 dist
 dist-ssr
+.next
+out
 *.local
+*.log
 .vscode/*
 .idea
 .DS_Store
