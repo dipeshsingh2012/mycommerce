@@ -7,6 +7,7 @@ import { ProductPageFragment, ProductDetail } from '@mycommerce/product-page-ui'
 import { CartFragment } from '@mycommerce/cart-ui';
 import { CheckoutFragment, OrderReceipt } from '@mycommerce/checkout-ui';
 import { CounterCheckWidget } from '@mycommerce/counter-check';
+import { SearchFragment, SearchModal, SearchProduct } from '@mycommerce/search-ui';
 import { CheckCircle2, X, ShoppingBag } from 'lucide-react';
 
 export const App: React.FC = () => {
@@ -15,6 +16,7 @@ export const App: React.FC = () => {
   const [activeClearanceFilter, setActiveClearanceFilter] = useState<number | null>(null);
   const [activeProductId, setActiveProductId] = useState<string>('prod_breville_barista_touch');
   const [cartCount, setCartCount] = useState<number>(2); // 2 seed items in cart
+  const [isSearchModalOpen, setIsSearchModalOpen] = useState<boolean>(false);
   const [toastMessage, setToastMessage] = useState<{ text: string; actionText?: string; actionRoute?: string } | null>(null);
 
   useEffect(() => {
@@ -32,6 +34,19 @@ export const App: React.FC = () => {
     handleHashChange();
 
     return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
+
+  // Global keyboard shortcut for Search (⌘K / Ctrl+K)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setIsSearchModalOpen((prev) => !prev);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
   const navigate = (route: string) => {
@@ -74,6 +89,30 @@ export const App: React.FC = () => {
           onProductSelect={(product) => {
             setActiveProductId(product.id);
             navigate(`#/product/${product.id}`);
+          }}
+        />
+      );
+    }
+
+    if (currentRoute.startsWith('#/search')) {
+      const queryString = currentRoute.includes('?') ? currentRoute.split('?')[1] : '';
+      const params = new URLSearchParams(queryString);
+      const searchQ = params.get('q') || '';
+
+      return (
+        <SearchFragment
+          initialQuery={searchQ}
+          initialMaxHeight={activeClearanceFilter}
+          onClearanceFilterChange={(cm) => {
+            setActiveClearanceFilter(cm);
+          }}
+          onProductSelect={(product: SearchProduct) => {
+            setActiveProductId(product.id);
+            navigate(`#/product/${product.id}`);
+          }}
+          onAddToCart={(product: SearchProduct) => {
+            setCartCount((c) => c + 1);
+            showToast(`Added ${product.name} to cart!`, 'View Cart', '#/cart');
           }}
         />
       );
@@ -168,6 +207,7 @@ export const App: React.FC = () => {
         onNavigate={navigate}
         cartCount={cartCount}
         activeClearanceFilter={activeClearanceFilter}
+        onOpenSearch={() => setIsSearchModalOpen(true)}
       />
 
       {/* Main Micro-Frontend Viewport */}
@@ -199,6 +239,22 @@ export const App: React.FC = () => {
           </button>
         </div>
       )}
+
+      {/* Global Instant Search Modal (Triggered by ⌘K or Navbar Search) */}
+      <SearchModal
+        isOpen={isSearchModalOpen}
+        onClose={() => setIsSearchModalOpen(false)}
+        initialClearance={activeClearanceFilter}
+        onSelectProduct={(product: SearchProduct) => {
+          setActiveProductId(product.id);
+          navigate(`#/product/${product.id}`);
+        }}
+        onFullSearch={(query: string, maxHeight?: number | null) => {
+          if (maxHeight !== undefined) setActiveClearanceFilter(maxHeight);
+          const qParam = query ? `?q=${encodeURIComponent(query)}` : '';
+          navigate(`#/search${qParam}`);
+        }}
+      />
 
       {/* Global Footer */}
       <Footer />

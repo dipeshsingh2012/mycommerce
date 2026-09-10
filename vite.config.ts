@@ -18,6 +18,7 @@ export default defineConfig({
       '@mycommerce/product-page-ui': path.resolve(__dirname, '../product-page-ui/src/index.ts'),
       '@mycommerce/cart-ui': path.resolve(__dirname, '../cart-ui/src/index.ts'),
       '@mycommerce/checkout-ui': path.resolve(__dirname, '../checkout-ui/src/index.ts'),
+      '@mycommerce/search-ui': path.resolve(__dirname, '../search-ui/src/index.ts'),
     },
   },
 });

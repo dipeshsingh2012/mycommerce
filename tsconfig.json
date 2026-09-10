@@ -22,7 +22,8 @@
       "@mycommerce/discovery-ui": ["../discovery-ui/src/index.ts"],
       "@mycommerce/product-page-ui": ["../product-page-ui/src/index.ts"],
       "@mycommerce/cart-ui": ["../cart-ui/src/index.ts"],
-      "@mycommerce/checkout-ui": ["../checkout-ui/src/index.ts"]
+      "@mycommerce/checkout-ui": ["../checkout-ui/src/index.ts"],
+      "@mycommerce/search-ui": ["../search-ui/src/index.ts"]
     }
   },
   "include": ["src"],

@@ -1,11 +1,12 @@
 import React from 'react';
-import { ShoppingBag, Ruler, Home, Grid, CreditCard } from 'lucide-react';
+import { ShoppingBag, Ruler, Home, Grid, CreditCard, Search } from 'lucide-react';
 
 interface NavbarProps {
   currentRoute: string;
   onNavigate: (route: string) => void;
   cartCount?: number;
   activeClearanceFilter?: number | null;
+  onOpenSearch?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -13,14 +14,15 @@ export const Navbar: React.FC<NavbarProps> = ({
   onNavigate,
   cartCount = 0,
   activeClearanceFilter,
+  onOpenSearch,
 }) => {
   return (
     <header className="bg-white border-b border-slate-200 sticky top-0 z-40 backdrop-blur-md bg-white/90">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
         {/* Brand Logo */}
         <div
           onClick={() => onNavigate('#/')}
-          className="flex items-center gap-2.5 cursor-pointer select-none group"
+          className="flex items-center gap-2.5 cursor-pointer select-none group shrink-0"
         >
           <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 text-white flex items-center justify-center font-black text-base shadow-sm shadow-indigo-200 group-hover:scale-105 transition-transform">
             m
@@ -34,7 +36,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         </div>
 
         {/* Center Links */}
-        <nav className="hidden md:flex items-center gap-6">
+        <nav className="hidden md:flex items-center gap-6 shrink-0">
           <button
             type="button"
             onClick={() => onNavigate('#/')}
@@ -61,12 +63,40 @@ export const Navbar: React.FC<NavbarProps> = ({
           </button>
         </nav>
 
-        {/* Right Section: Active Clearance Badge, Cart, Checkout */}
-        <div className="flex items-center gap-3">
+        {/* Search Bar / Trigger */}
+        <div className="flex-1 max-w-xs hidden sm:block">
+          <button
+            type="button"
+            onClick={onOpenSearch || (() => onNavigate('#/search'))}
+            className="w-full flex items-center justify-between gap-2 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200/80 border border-slate-200/80 text-slate-400 text-xs font-medium transition-all group"
+            title="Search appliances and dimensions (⌘K)"
+          >
+            <div className="flex items-center gap-2 truncate">
+              <Search className="w-3.5 h-3.5 text-slate-400 group-hover:text-indigo-600 transition-colors shrink-0" />
+              <span className="truncate">Search machines, brands...</span>
+            </div>
+            <kbd className="hidden lg:inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-white border border-slate-200 text-[10px] font-bold text-slate-400 shadow-2xs">
+              <span>⌘</span>K
+            </kbd>
+          </button>
+        </div>
+
+        {/* Right Section: Mobile Search, Clearance Badge, Cart, Checkout */}
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+          {/* Mobile Search Button */}
+          <button
+            type="button"
+            onClick={onOpenSearch || (() => onNavigate('#/search'))}
+            className="sm:hidden p-2 rounded-xl text-slate-700 hover:text-indigo-600 hover:bg-slate-100"
+            title="Search"
+          >
+            <Search className="w-5 h-5" />
+          </button>
+
           {activeClearanceFilter && (
-            <div className="hidden sm:flex items-center gap-1 px-2.5 py-1 rounded-lg bg-indigo-50 border border-indigo-100 text-indigo-700 text-xs font-semibold">
+            <div className="hidden lg:flex items-center gap-1 px-2.5 py-1 rounded-lg bg-indigo-50 border border-indigo-100 text-indigo-700 text-xs font-semibold">
               <Ruler className="w-3 h-3" />
-              <span>≤ {activeClearanceFilter} cm clearance</span>
+              <span>≤ {activeClearanceFilter} cm</span>
             </div>
           )}
 
