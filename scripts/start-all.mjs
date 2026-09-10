@@ -1,6 +1,17 @@
 import { spawn } from 'node:child_process';
 
-const services = [
+const pythonBin = '/home/dipes/projects/fleet-cortex/.venv/bin/python';
+
+const backends = [
+  { name: 'counter-check-service', port: 8000, dir: '/home/dipes/projects/counter-check-service' },
+  { name: 'product-catalog-service', port: 8001, dir: '/home/dipes/projects/product-catalog-service' },
+  { name: 'homepage-service', port: 8002, dir: '/home/dipes/projects/homepage-service' },
+  { name: 'cart-service', port: 8003, dir: '/home/dipes/projects/cart-service' },
+  { name: 'order-service', port: 8004, dir: '/home/dipes/projects/order-service' },
+  { name: 'search-service', port: 8005, dir: '/home/dipes/projects/search-service' },
+];
+
+const frontends = [
   { name: 'counter-check', port: 5173, dir: '/home/dipes/projects/counter-check', cmd: ['vite', 'preview', '--port', '5173'] },
   { name: 'homepage-ui', port: 5174, dir: '/home/dipes/projects/homepage-ui', cmd: ['vite', 'preview', '--port', '5174'] },
   { name: 'product-page-ui', port: 5175, dir: '/home/dipes/projects/product-page-ui', cmd: ['vite', 'preview', '--port', '5175'] },
@@ -13,17 +24,31 @@ const services = [
 
 const children = [];
 
-for (const s of services) {
-  const child = spawn('npx', s.cmd, {
-    cwd: s.dir,
+for (const b of backends) {
+  const child = spawn(
+    pythonBin,
+    ['-m', 'uvicorn', 'src.main:app', '--host', '0.0.0.0', '--port', String(b.port)],
+    {
+      cwd: b.dir,
+      env: { ...process.env, PYTHONPATH: b.dir },
+      stdio: 'inherit',
+    }
+  );
+  children.push({ ...b, child });
+  console.log(`[Suite] Started backend ${b.name} on port ${b.port}`);
+}
+
+for (const f of frontends) {
+  const child = spawn('npx', f.cmd, {
+    cwd: f.dir,
     stdio: 'inherit',
   });
-  children.push({ ...s, child });
-  console.log(`[mycommerce] Started ${s.name} on port ${s.port}`);
+  children.push({ ...f, child });
+  console.log(`[Suite] Started frontend ${f.name} on port ${f.port}`);
 }
 
 const cleanup = () => {
-  console.log('\n[mycommerce] Shutting down all processes...');
+  console.log('\n[Suite] Shutting down all processes...');
   for (const { child } of children) {
     try {
       child.kill('SIGTERM');

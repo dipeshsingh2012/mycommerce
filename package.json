@@ -8,7 +8,8 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "start:remotes": "node scripts/start-remotes.mjs",
-    "start:all": "node scripts/start-all.mjs"
+    "start:all": "node scripts/start-all.mjs",
+    "start:backend": "node scripts/start-backend.mjs"
   },
   "dependencies": {
     "clsx": "^2.1.1",
