@@ -1,5 +1,5 @@
 import React, { useState, useEffect, Suspense, lazy } from 'react';
-import { ProtonThemeProvider } from '@dipeshsingh2012/proton/react';
+import { ProtonThemeProvider } from '@dipesh.singh/proton/react';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 import { MfeErrorBoundary } from './components/MfeErrorBoundary';
