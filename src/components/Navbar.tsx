@@ -1,5 +1,6 @@
 import React from 'react';
 import { ShoppingBag, Ruler, Home, Grid, CreditCard, Search } from 'lucide-react';
+import { ProtonStatusBadge, ProtonButton } from 'proton/react';
 
 interface NavbarProps {
   currentRoute: string;
@@ -79,7 +80,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             title="Search appliances and dimensions (⌘K)"
           >
             <div className="flex items-center gap-2 truncate">
-              <Search className="w-3.5 h-3.5 text-slate-400 group-hover:text-indigo-600 transition-colors shrink-0" />
+              <Search className="w-3.5 h-3.5 text-slate-400 group-hover:text-amber-700 transition-colors shrink-0" />
               <span className="truncate">Search machines, brands...</span>
             </div>
             <kbd className="hidden lg:inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-white border border-slate-200 text-[10px] font-bold text-slate-400 shadow-2xs">
@@ -94,41 +95,47 @@ export const Navbar: React.FC<NavbarProps> = ({
           <button
             type="button"
             onClick={onOpenSearch || (() => onNavigate('#/search'))}
-            className="sm:hidden p-2 rounded-xl text-slate-700 hover:text-indigo-600 hover:bg-slate-100"
+            className="sm:hidden p-2 rounded-xl text-slate-700 hover:text-amber-700 hover:bg-slate-100"
             title="Search"
           >
             <Search className="w-5 h-5" />
           </button>
 
           {activeClearanceFilter && (
-            <div className="hidden lg:flex items-center gap-1 px-2.5 py-1 rounded-lg bg-indigo-50 border border-indigo-100 text-indigo-700 text-xs font-semibold">
-              <Ruler className="w-3 h-3" />
-              <span>≤ {activeClearanceFilter} cm</span>
+            <div className="hidden lg:block">
+              <ProtonStatusBadge
+                status="coffee"
+                icon={<Ruler style={{ width: 12, height: 12 }} />}
+                label={`≤ ${activeClearanceFilter} cm`}
+                size="sm"
+              />
             </div>
           )}
 
           <button
             type="button"
             onClick={() => onNavigate('#/cart')}
-            className="relative p-2 rounded-xl text-slate-700 hover:text-indigo-600 hover:bg-slate-100 transition-colors"
+            className="relative p-2 rounded-xl text-slate-700 hover:text-amber-700 hover:bg-slate-100 transition-colors"
             title="View Cart"
           >
             <ShoppingBag className="w-5 h-5" />
             {cartCount > 0 && (
-              <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-indigo-600 text-white text-[10px] font-bold flex items-center justify-center shadow-xs">
+              <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-amber-700 text-white text-[10px] font-bold flex items-center justify-center shadow-xs">
                 {cartCount}
               </span>
             )}
           </button>
 
-          <button
-            type="button"
-            onClick={() => onNavigate('#/checkout')}
-            className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold shadow-xs transition-colors"
-          >
-            <CreditCard className="w-3.5 h-3.5" />
-            Checkout
-          </button>
+          <div className="hidden sm:block">
+            <ProtonButton
+              size="sm"
+              variant="secondary"
+              startIcon={<CreditCard style={{ width: 14, height: 14 }} />}
+              onClick={() => onNavigate('#/checkout')}
+            >
+              Checkout
+            </ProtonButton>
+          </div>
         </div>
       </div>
     </header>

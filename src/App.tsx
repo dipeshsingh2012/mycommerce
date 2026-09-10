@@ -1,4 +1,5 @@
 import React, { useState, useEffect, Suspense, lazy } from 'react';
+import { ProtonThemeProvider } from 'proton/react';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 import { MfeErrorBoundary } from './components/MfeErrorBoundary';
@@ -282,71 +283,73 @@ export const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col selection:bg-indigo-600 selection:text-white">
-      {/* Global MFE Storefront Header */}
-      <Navbar
-        currentRoute={currentRoute}
-        onNavigate={navigate}
-        cartCount={cartCount}
-        activeClearanceFilter={activeClearanceFilter}
-        onOpenSearch={() => setIsSearchModalOpen(true)}
-      />
+    <ProtonThemeProvider>
+      <div className="min-h-screen bg-slate-50 flex flex-col selection:bg-amber-700 selection:text-white">
+        {/* Global MFE Storefront Header */}
+        <Navbar
+          currentRoute={currentRoute}
+          onNavigate={navigate}
+          cartCount={cartCount}
+          activeClearanceFilter={activeClearanceFilter}
+          onOpenSearch={() => setIsSearchModalOpen(true)}
+        />
 
-      {/* Main Micro-Frontend Viewport */}
-      <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-6">
-        {renderRouteFragment()}
-      </main>
+        {/* Main Micro-Frontend Viewport */}
+        <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-6">
+          {renderRouteFragment()}
+        </main>
 
-      {/* Floating Notification Toast */}
-      {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-4 py-3 bg-slate-900 text-white rounded-2xl shadow-xl border border-slate-700 animate-in fade-in slide-in-from-bottom-2 duration-200">
-          <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
-          <span className="text-xs font-semibold">{toastMessage.text}</span>
-          {toastMessage.actionText && toastMessage.actionRoute && (
+        {/* Floating Notification Toast */}
+        {toastMessage && (
+          <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-4 py-3 bg-slate-900 text-white rounded-2xl shadow-xl border border-slate-700 animate-in fade-in slide-in-from-bottom-2 duration-200">
+            <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+            <span className="text-xs font-semibold">{toastMessage.text}</span>
+            {toastMessage.actionText && toastMessage.actionRoute && (
+              <button
+                type="button"
+                onClick={() => navigate(toastMessage.actionRoute!)}
+                className="ml-2 px-2.5 py-1 bg-amber-700 hover:bg-amber-600 text-white rounded-lg text-[11px] font-bold transition-colors flex items-center gap-1"
+              >
+                <ShoppingBag className="w-3 h-3" />
+                {toastMessage.actionText}
+              </button>
+            )}
             <button
               type="button"
-              onClick={() => navigate(toastMessage.actionRoute!)}
-              className="ml-2 px-2.5 py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-[11px] font-bold transition-colors flex items-center gap-1"
+              onClick={() => setToastMessage(null)}
+              className="p-1 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white"
             >
-              <ShoppingBag className="w-3 h-3" />
-              {toastMessage.actionText}
+              <X className="w-4 h-4" />
             </button>
-          )}
-          <button
-            type="button"
-            onClick={() => setToastMessage(null)}
-            className="p-1 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white"
-          >
-            <X className="w-4 h-4" />
-          </button>
-        </div>
-      )}
+          </div>
+        )}
 
-      {/* Global Instant Search Modal (Federated Remote) */}
-      {isSearchModalOpen && (
-        <MfeErrorBoundary fragmentName="SearchModal">
-          <Suspense fallback={null}>
-            <SearchModal
-              isOpen={isSearchModalOpen}
-              onClose={() => setIsSearchModalOpen(false)}
-              initialClearance={activeClearanceFilter}
-              onSelectProduct={(product: any) => {
-                setActiveProductId(product.id);
-                navigate(`#/product/${product.id}`);
-              }}
-              onFullSearch={(query: string, maxHeight?: number | null) => {
-                if (maxHeight !== undefined) setActiveClearanceFilter(maxHeight);
-                const qParam = query ? `?q=${encodeURIComponent(query)}` : '';
-                navigate(`#/search${qParam}`);
-              }}
-            />
-          </Suspense>
-        </MfeErrorBoundary>
-      )}
+        {/* Global Instant Search Modal (Federated Remote) */}
+        {isSearchModalOpen && (
+          <MfeErrorBoundary fragmentName="SearchModal">
+            <Suspense fallback={null}>
+              <SearchModal
+                isOpen={isSearchModalOpen}
+                onClose={() => setIsSearchModalOpen(false)}
+                initialClearance={activeClearanceFilter}
+                onSelectProduct={(product: any) => {
+                  setActiveProductId(product.id);
+                  navigate(`#/product/${product.id}`);
+                }}
+                onFullSearch={(query: string, maxHeight?: number | null) => {
+                  if (maxHeight !== undefined) setActiveClearanceFilter(maxHeight);
+                  const qParam = query ? `?q=${encodeURIComponent(query)}` : '';
+                  navigate(`#/search${qParam}`);
+                }}
+              />
+            </Suspense>
+          </MfeErrorBoundary>
+        )}
 
-      {/* Global Footer */}
-      <Footer />
-    </div>
+        {/* Global Footer */}
+        <Footer />
+      </div>
+    </ProtonThemeProvider>
   );
 };
 
