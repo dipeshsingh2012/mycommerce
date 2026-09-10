@@ -1,6 +1,6 @@
 import React from 'react';
 import { ShoppingBag, Ruler, Home, Grid, CreditCard, Search } from 'lucide-react';
-import { ProtonStatusBadge, ProtonButton } from 'proton/react';
+import { ProtonStatusBadge, ProtonButton } from '@dipeshsingh2012/proton/react';
 
 interface NavbarProps {
   currentRoute: string;
