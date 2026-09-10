@@ -4,30 +4,57 @@ import { Footer } from './components/Footer';
 import { MfeErrorBoundary } from './components/MfeErrorBoundary';
 import { CheckCircle2, X, ShoppingBag } from 'lucide-react';
 
+// Resilient Federated Component Resolver
+function resolveFederatedComponent<T extends React.ComponentType<any>>(
+  modulePromise: Promise<any>,
+  componentName: string
+): Promise<{ default: T }> {
+  return modulePromise.then((m) => {
+    // 1. Root named export (e.g. m.HomepageFragment)
+    if (typeof m?.[componentName] === 'function') {
+      return { default: m[componentName] };
+    }
+    // 2. Nested inside wrapDefault (e.g. m.default.HomepageFragment)
+    if (typeof m?.default?.[componentName] === 'function') {
+      return { default: m.default[componentName] };
+    }
+    // 3. Default export function (e.g. m.default)
+    if (typeof m?.default === 'function') {
+      return { default: m.default };
+    }
+    // 4. Directly exported component function
+    if (typeof m === 'function') {
+      return { default: m };
+    }
+    console.error(`[MFE Resolver] Could not resolve component "${componentName}" from module:`, m);
+    throw new TypeError(`Module federation remote for "${componentName}" did not export a valid React component.`);
+  });
+}
+
 // Dynamic Module Federation Lazy Imports
 const HomepageFragment = lazy(() =>
-  import('homepageUi/HomepageFragment').then((m) => ({ default: m.HomepageFragment || m.default }))
+  resolveFederatedComponent(import('homepageUi/HomepageFragment'), 'HomepageFragment')
 );
 const DiscoveryFragment = lazy(() =>
-  import('discoveryUi/DiscoveryFragment').then((m) => ({ default: m.DiscoveryFragment || m.default }))
+  resolveFederatedComponent(import('discoveryUi/DiscoveryFragment'), 'DiscoveryFragment')
 );
 const ProductPageFragment = lazy(() =>
-  import('productPageUi/ProductPageFragment').then((m) => ({ default: m.ProductPageFragment || m.default }))
+  resolveFederatedComponent(import('productPageUi/ProductPageFragment'), 'ProductPageFragment')
 );
 const CounterCheckWidget = lazy(() =>
-  import('counterCheck/CounterCheckWidget').then((m) => ({ default: m.CounterCheckWidget || m.default }))
+  resolveFederatedComponent(import('counterCheck/CounterCheckWidget'), 'CounterCheckWidget')
 );
 const CartFragment = lazy(() =>
-  import('cartUi/CartFragment').then((m) => ({ default: m.CartFragment || m.default }))
+  resolveFederatedComponent(import('cartUi/CartFragment'), 'CartFragment')
 );
 const CheckoutFragment = lazy(() =>
-  import('checkoutUi/CheckoutFragment').then((m) => ({ default: m.CheckoutFragment || m.default }))
+  resolveFederatedComponent(import('checkoutUi/CheckoutFragment'), 'CheckoutFragment')
 );
 const SearchModal = lazy(() =>
-  import('searchUi/SearchModal').then((m) => ({ default: m.SearchModal || m.default }))
+  resolveFederatedComponent(import('searchUi/SearchModal'), 'SearchModal')
 );
 const SearchFragment = lazy(() =>
-  import('searchUi/SearchFragment').then((m) => ({ default: m.SearchFragment || m.default }))
+  resolveFederatedComponent(import('searchUi/SearchFragment'), 'SearchFragment')
 );
 
 const MfeLoadingPlaceholder: React.FC<{ name: string }> = ({ name }) => (
