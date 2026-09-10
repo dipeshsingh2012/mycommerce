@@ -64,7 +64,7 @@ const BESTSELLER_PRODUCTS: SliderProduct[] = [
     price: '₹ 1,250',
     badge: 'NEW',
     imageUrl: 'https://images.unsplash.com/photo-1587734195503-904fca47e0e9?w=600&auto=format&fit=crop&q=80',
-    productUrl: '/coffees',
+    productUrl: '/product/prod_baarbara_whiskey',
   },
   {
     id: 'prod_attikan_estate',
@@ -73,7 +73,7 @@ const BESTSELLER_PRODUCTS: SliderProduct[] = [
     price: '₹ 550',
     badge: 'BESTSELLER',
     imageUrl: 'https://images.unsplash.com/photo-1610632380989-680fe40816c6?w=600&auto=format&fit=crop&q=80',
-    productUrl: '/coffees',
+    productUrl: '/product/prod_attikan_estate',
   },
   {
     id: 'prod_silver_oak_blend',
@@ -81,7 +81,7 @@ const BESTSELLER_PRODUCTS: SliderProduct[] = [
     subtitle: 'Hazelnut, Honey, Crisp Green Apple, balanced morning brew',
     price: '₹ 520',
     imageUrl: 'https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=600&auto=format&fit=crop&q=80',
-    productUrl: '/coffees',
+    productUrl: '/product/prod_silver_oak_blend',
   },
   {
     id: 'prod_vienna_roast',
@@ -90,7 +90,7 @@ const BESTSELLER_PRODUCTS: SliderProduct[] = [
     price: '₹ 530',
     badge: 'POPULAR',
     imageUrl: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=600&auto=format&fit=crop&q=80',
-    productUrl: '/coffees',
+    productUrl: '/product/prod_vienna_roast',
   },
   {
     id: 'prod_cold_brew_blend',
@@ -98,7 +98,7 @@ const BESTSELLER_PRODUCTS: SliderProduct[] = [
     subtitle: 'Sweet citrus, Milk Chocolate, stone fruits, low acidity',
     price: '₹ 580',
     imageUrl: 'https://images.unsplash.com/photo-1517668808822-9ebb02f2a0e6?w=600&auto=format&fit=crop&q=80',
-    productUrl: '/coffees',
+    productUrl: '/product/prod_cold_brew_blend',
   },
 ];
 
