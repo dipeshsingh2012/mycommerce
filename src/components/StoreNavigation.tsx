@@ -2,7 +2,8 @@
 
 import React, { useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { PromoBar, NavigationHeader, Footer as StoreFooter, NavLinkItem } from '@dipesh.singh/commerce-ui';
+import { PromoBar, NavigationHeader, NavLinkItem } from '@dipesh.singh/commerce-ui';
+import { Footer } from './Footer';
 import { ProtonThemeProvider } from '@dipesh.singh/proton/react';
 import { CheckCircle2, X, ShoppingBag } from 'lucide-react';
 
@@ -126,45 +127,12 @@ export const StoreNavigation: React.FC<StoreNavigationProps> = ({ children }) =>
         )}
 
         {/* Storefront Footer */}
-        <StoreFooter
-          brandName="Hiljhil Cafe & Roastery"
-          privacyPolicyUrl="/privacy"
-          termsUrl="/terms"
-          newsletterDisclaimer="BE THE FIRST TO KNOW ABOUT OUR SPECIAL OFFERS, BREWING RECIPES, AND CAFE EVENTS. NO SPAM, GUARANTEED."
+        <Footer
+          brandName="HILJHIL ROASTERS"
           onNewsletterSubmit={async (email) => {
             await new Promise((r) => setTimeout(r, 600));
             showToast(`Thank you for subscribing with ${email}!`);
           }}
-          sections={[
-            {
-              title: 'EXPLORE',
-              links: [
-                { label: 'Bestseller Coffees', href: '/coffees' },
-                { label: 'Espresso Machines', href: '/equipment' },
-                { label: 'Burr Grinders', href: '/equipment' },
-                { label: 'Roast Subscriptions', href: '/subscriptions' },
-                { label: 'Special Offers', href: '/offers' },
-              ],
-            },
-            {
-              title: 'EXPERIENCE',
-              links: [
-                { label: 'Our Cafes & Roastery', href: '/cafes' },
-                { label: 'Flagship Bangalore', href: '/cafes' },
-                { label: 'Flagship Mumbai', href: '/cafes' },
-                { label: 'Weekend Cupping Bar', href: '/cafes' },
-              ],
-            },
-            {
-              title: 'ABOUT',
-              links: [
-                { label: 'Our Story & Heritage', href: '/about' },
-                { label: 'Direct Trade Coffee', href: '/about' },
-                { label: 'Privacy Policy', href: '/privacy' },
-                { label: 'Terms of Service', href: '/terms' },
-              ],
-            },
-          ]}
         />
       </div>
     </ProtonThemeProvider>

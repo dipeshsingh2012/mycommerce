@@ -27,6 +27,7 @@ const frontends = [
   { name: 'checkout-ui', port: 5178, dir: '/home/dipes/projects/checkout-ui', cmd: ['vite', 'preview', '--port', '5178'] },
   { name: 'search-ui', port: 5179, dir: '/home/dipes/projects/search-ui', cmd: ['vite', 'preview', '--port', '5179'] },
   { name: 'pim-ui', port: 5180, dir: '/home/dipes/projects/pim-ui', cmd: ['vite', '--port', '5180'] },
+  { name: 'testimonials-ui', port: 5181, dir: '/home/dipes/projects/testimonials-ui', cmd: ['vite', 'preview', '--port', '5181'] },
   { name: 'mycommerce (host)', port: 5170, dir: '/home/dipes/projects/mycommerce', cmd: ['next', 'dev', '-p', '5170'] },
 ];
 

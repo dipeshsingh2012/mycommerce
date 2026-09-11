@@ -9,6 +9,7 @@ const remotes = [
   { name: 'discovery-ui', port: 5177, dir: '/home/dipes/projects/discovery-ui' },
   { name: 'checkout-ui', port: 5178, dir: '/home/dipes/projects/checkout-ui' },
   { name: 'search-ui', port: 5179, dir: '/home/dipes/projects/search-ui' },
+  { name: 'testimonials-ui', port: 5181, dir: '/home/dipes/projects/testimonials-ui' },
 ];
 
 const children = [];
