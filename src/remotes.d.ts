@@ -106,3 +106,33 @@ declare module 'searchUi/SearchBar' {
   export const SearchBar: React.FC<SearchBarProps>;
   export default SearchBar;
 }
+
+declare module 'testimonialsUi/TestimonialsFragment' {
+  import React from 'react';
+  export interface TestimonialsFragmentProps {
+    title?: string;
+    subtitle?: string;
+    onProductSelect?: (productId?: string) => void;
+    showStats?: boolean;
+    className?: string;
+  }
+  export const TestimonialsFragment: React.FC<TestimonialsFragmentProps>;
+  export default TestimonialsFragment;
+}
+
+declare module 'testimonialsUi/TestimonialCard' {
+  import React from 'react';
+  export const TestimonialCard: React.FC<any>;
+  export default TestimonialCard;
+}
+
+declare module 'upsellRemote/UpsellWidget' {
+  import React from 'react';
+  export interface UpsellWidgetProps {
+    productId?: string;
+    onAddToCart?: (item: any) => void;
+    className?: string;
+  }
+  export const UpsellWidget: React.FC<UpsellWidgetProps>;
+  export default UpsellWidget;
+}

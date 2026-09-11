@@ -18,6 +18,8 @@ export default defineConfig(({ mode }) => {
           cartUi: env.VITE_MFE_CART_URL || 'https://storage.googleapis.com/mycommerce/mfes/cart-ui/assets/remoteEntry.js',
           checkoutUi: env.VITE_MFE_CHECKOUT_URL || 'https://storage.googleapis.com/mycommerce/mfes/checkout-ui/assets/remoteEntry.js',
           searchUi: env.VITE_MFE_SEARCH_URL || 'https://storage.googleapis.com/mycommerce/mfes/search-ui/assets/remoteEntry.js',
+          testimonialsUi: env.VITE_MFE_TESTIMONIALS_URL || 'https://storage.googleapis.com/mycommerce/mfes/testimonials-ui/assets/remoteEntry.js',
+          upsellRemote: env.VITE_MFE_UPSELL_URL || 'https://storage.googleapis.com/mycommerce/mfes/upsell-recommendations/assets/remoteEntry.js',
         },
         shared: ['react', 'react-dom'],
       }),
