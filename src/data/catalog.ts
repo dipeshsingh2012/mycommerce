@@ -1,19 +1,5 @@
-export interface ProductItem {
-  id: string;
-  name: string;
-  category: 'coffee' | 'equipment';
-  priceCents: number;
-  compareAtCents?: number;
-  badge?: string;
-  heightCm?: number;
-  rating: number;
-  reviewCount: number;
-  tasteNotes?: string[];
-  specs?: Record<string, string>;
-  description: string;
-  image: string;
-  inStock?: boolean;
-}
+import type { ProductItem } from '@/lib/catalogApi';
+export type { ProductItem };
 
 export const CATALOG_DATA: Record<string, ProductItem> = {
   prod_baarbara_whiskey: {

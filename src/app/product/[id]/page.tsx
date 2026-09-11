@@ -1,21 +1,29 @@
 import React from 'react';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { CATALOG_DATA, ALL_PRODUCTS } from '@/data/catalog';
+import { fetchProducts, fetchProductByIdOrSlug } from '@/lib/catalogApi';
 import { ProductDetailView } from './ProductDetailView';
 
 interface PageProps {
   params: { id: string };
 }
 
+export const dynamicParams = true;
+
 export async function generateStaticParams() {
-  return ALL_PRODUCTS.map((p) => ({
-    id: p.id,
-  }));
+  try {
+    const products = await fetchProducts({ limit: 100 });
+    return products.map((p) => ({
+      id: p.id,
+    }));
+  } catch (err) {
+    console.error('generateStaticParams error:', err);
+    return [];
+  }
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const product = CATALOG_DATA[params.id];
+  const product = await fetchProductByIdOrSlug(params.id);
   if (!product) {
     return {
       title: 'Product Not Found | Hiljhil Cafe',
@@ -57,8 +65,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-export default function ProductPage({ params }: PageProps) {
-  const product = CATALOG_DATA[params.id];
+export default async function ProductPage({ params }: PageProps) {
+  const product = await fetchProductByIdOrSlug(params.id);
   if (!product) {
     notFound();
   }
@@ -73,7 +81,7 @@ export default function ProductPage({ params }: PageProps) {
     sku: product.id,
     brand: {
       '@type': 'Brand',
-      name: 'Hiljhil Cafe',
+      name: 'Hiljhil Roasters',
     },
     offers: {
       '@type': 'Offer',

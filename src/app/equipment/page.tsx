@@ -1,53 +1,34 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Ruler, ShieldCheck, ShoppingBag } from 'lucide-react';
+import Link from 'next/link';
+import { Ruler, ShoppingBag } from 'lucide-react';
 import { FitmentBadge } from '@dipesh.singh/commerce-ui';
-
-const EQUIPMENT_PRODUCTS = [
-  {
-    id: 'prod_breville_barista_touch',
-    title: 'BREVILLE BARISTA TOUCH IMPRESS',
-    subtitle: 'Automated touchscreen espresso machine with precision dosing & auto-milking',
-    price: '₹ 89,900',
-    heightCm: 41.0,
-    badge: 'FLAGSHIP',
-    imageUrl: 'https://images.unsplash.com/photo-1517668808822-9ebb02f2a0e6?w=600&auto=format&fit=crop&q=80',
-  },
-  {
-    id: 'prod_fellow_ode_gen2',
-    title: 'FELLOW ODE BREW GRINDER GEN 2',
-    subtitle: '64mm flat burr precision grinder calibrated for pour-over, drip & French press',
-    price: '₹ 28,500',
-    heightCm: 24.1,
-    badge: 'POPULAR',
-    imageUrl: 'https://images.unsplash.com/photo-1589396575653-c09c794ff6a6?w=600&auto=format&fit=crop&q=80',
-  },
-  {
-    id: 'prod_timemore_chestnut_c3',
-    title: 'TIMEMORE CHESTNUT C3 PRO MANUAL GRINDER',
-    subtitle: 'Foldable handle hand grinder with S2C stainless steel burrs',
-    price: '₹ 6,499',
-    heightCm: 16.0,
-    badge: 'PORTABLE',
-    imageUrl: 'https://images.unsplash.com/photo-1544787219-7f47ccb76574?w=600&auto=format&fit=crop&q=80',
-  },
-  {
-    id: 'prod_hario_v60_kettle',
-    title: 'HARIO BUONO GOOSENECK KETTLE 1.2L',
-    subtitle: 'Ergonomic precision pour spout for temperature-controlled pour-overs',
-    price: '₹ 4,200',
-    heightCm: 14.5,
-    imageUrl: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=600&auto=format&fit=crop&q=80',
-  },
-];
+import { fetchEquipment, ProductItem } from '@/lib/catalogApi';
 
 export default function EquipmentPage() {
   const router = useRouter();
+  const [equipment, setEquipment] = useState<ProductItem[]>([]);
+  const [loading, setLoading] = useState(true);
   const [maxHeight, setMaxHeight] = useState<number>(45);
 
-  const filteredGear = EQUIPMENT_PRODUCTS.filter((item) => item.heightCm <= maxHeight);
+  useEffect(() => {
+    async function loadEquipment() {
+      try {
+        setLoading(true);
+        const data = await fetchEquipment();
+        setEquipment(data);
+      } catch (err) {
+        console.error('Failed to load equipment from catalog service:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadEquipment();
+  }, []);
+
+  const filteredGear = equipment.filter((item) => !item.heightCm || item.heightCm <= maxHeight);
 
   return (
     <div className="space-y-8 py-6">
@@ -94,65 +75,82 @@ export default function EquipmentPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6">
-        {filteredGear.map((prod) => (
-          <div
-            key={prod.id}
-            className="bg-white rounded-2xl border border-slate-200/90 overflow-hidden shadow-xs hover:shadow-md transition-shadow flex flex-col justify-between group p-5 space-y-4"
-          >
-            <div className="relative aspect-video rounded-xl overflow-hidden bg-slate-100">
-              <img
-                src={prod.imageUrl}
-                alt={prod.title}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-              />
-              {prod.badge && (
-                <span className="absolute top-3 left-3 px-2.5 py-1 bg-amber-400 text-slate-900 text-[10px] font-black rounded-md tracking-wider">
-                  {prod.badge}
-                </span>
-              )}
-            </div>
+      {loading ? (
+        <div className="py-20 text-center space-y-3">
+          <div className="w-8 h-8 border-3 border-amber-800 border-t-transparent rounded-full animate-spin mx-auto" />
+          <p className="text-xs font-semibold text-slate-500">Loading equipment from catalog service...</p>
+        </div>
+      ) : filteredGear.length === 0 ? (
+        <div className="py-20 text-center text-slate-400 text-sm">
+          No hardware items found fitting beneath {maxHeight} cm.
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6">
+          {filteredGear.map((prod) => (
+            <div
+              key={prod.id}
+              className="bg-white rounded-2xl border border-slate-200/90 overflow-hidden shadow-xs hover:shadow-md transition-shadow flex flex-col justify-between group p-5 space-y-4"
+            >
+              <Link href={`/product/${prod.id}`} className="block">
+                <div className="relative aspect-video rounded-xl overflow-hidden bg-slate-100">
+                  <img
+                    src={prod.image}
+                    alt={prod.name}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  {prod.badge && (
+                    <span className="absolute top-3 left-3 px-2.5 py-1 bg-amber-400 text-slate-900 text-[10px] font-black rounded-md tracking-wider">
+                      {prod.badge}
+                    </span>
+                  )}
+                </div>
+              </Link>
 
-            <div className="space-y-2">
-              <div className="flex items-start justify-between gap-2">
-                <h3 className="font-bold text-slate-900 text-base leading-snug">
-                  {prod.title}
-                </h3>
-                <span className="text-base font-black text-slate-900 shrink-0">
-                  {prod.price}
-                </span>
+              <div className="space-y-2">
+                <div className="flex items-start justify-between gap-2">
+                  <Link href={`/product/${prod.id}`} className="hover:text-amber-800">
+                    <h3 className="font-bold text-slate-900 text-base leading-snug">
+                      {prod.name}
+                    </h3>
+                  </Link>
+                  <span className="text-base font-black text-slate-900 shrink-0">
+                    ₹ {(prod.priceCents / 100).toLocaleString('en-IN')}
+                  </span>
+                </div>
+                <p className="text-xs text-slate-500 leading-relaxed">
+                  {prod.description}
+                </p>
+                {prod.heightCm && (
+                  <div className="pt-2">
+                    <FitmentBadge
+                      status="verified"
+                      label={`Height: ${prod.heightCm} cm (Fits under standard ${maxHeight} cm cabinets)`}
+                    />
+                  </div>
+                )}
               </div>
-              <p className="text-xs text-slate-500 leading-relaxed">
-                {prod.subtitle}
-              </p>
-              <div className="pt-2">
-                <FitmentBadge
-                  status="verified"
-                  label={`Height: ${prod.heightCm} cm (Fits under standard ${maxHeight} cm cabinets)`}
-                />
-              </div>
-            </div>
 
-            <div className="pt-2 flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => router.push('/checkout')}
-                className="flex-1 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-colors"
-              >
-                BUY NOW
-              </button>
-              <button
-                type="button"
-                onClick={() => router.push('/cart')}
-                className="p-2.5 bg-amber-100 hover:bg-amber-200 text-amber-900 rounded-xl transition-colors"
-                title="Add to Cart"
-              >
-                <ShoppingBag className="w-4 h-4" />
-              </button>
+              <div className="pt-2 flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => router.push(`/product/${prod.id}`)}
+                  className="flex-1 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-colors text-center"
+                >
+                  VIEW SPECS
+                </button>
+                <button
+                  type="button"
+                  onClick={() => router.push(`/product/${prod.id}`)}
+                  className="p-2.5 bg-amber-100 hover:bg-amber-200 text-amber-900 rounded-xl transition-colors"
+                  title="View Equipment Details"
+                >
+                  <ShoppingBag className="w-4 h-4" />
+                </button>
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next';
-import { ALL_PRODUCTS } from '@/data/catalog';
+import { fetchProducts } from '@/lib/catalogApi';
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://hiljhil.com';
 
   const staticRoutes: MetadataRoute.Sitemap = [
@@ -61,12 +61,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ];
 
-  const productRoutes: MetadataRoute.Sitemap = ALL_PRODUCTS.map((prod) => ({
-    url: `${baseUrl}/product/${prod.id}`,
-    lastModified: new Date(),
-    changeFrequency: 'weekly',
-    priority: 0.9,
-  }));
+  let productRoutes: MetadataRoute.Sitemap = [];
+  try {
+    const products = await fetchProducts({ limit: 100 });
+    productRoutes = products.map((prod) => ({
+      url: `${baseUrl}/product/${prod.id}`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.9,
+    }));
+  } catch (err) {
+    console.error('Failed to generate product sitemap from catalog service:', err);
+  }
 
   return [...staticRoutes, ...productRoutes];
 }

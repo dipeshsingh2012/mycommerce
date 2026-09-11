@@ -56,51 +56,7 @@ const CATEGORY_TILES: CategoryTileItem[] = [
   },
 ];
 
-const BESTSELLER_PRODUCTS: SliderProduct[] = [
-  {
-    id: 'prod_baarbara_whiskey',
-    title: 'BAARBARA ESTATE - WHISKEY BARREL AGED',
-    subtitle: 'Ripe banana, Red Plum, Whiskey Oak, Vanilla sweetness',
-    price: '₹ 1,250',
-    badge: 'NEW',
-    imageUrl: 'https://images.unsplash.com/photo-1587734195503-904fca47e0e9?w=600&auto=format&fit=crop&q=80',
-    productUrl: '/product/prod_baarbara_whiskey',
-  },
-  {
-    id: 'prod_attikan_estate',
-    title: 'ATTIKAN ESTATE - DARK ROAST',
-    subtitle: 'Dark chocolate, Fig, Roasted Almonds, full-bodied espresso',
-    price: '₹ 550',
-    badge: 'BESTSELLER',
-    imageUrl: 'https://images.unsplash.com/photo-1610632380989-680fe40816c6?w=600&auto=format&fit=crop&q=80',
-    productUrl: '/product/prod_attikan_estate',
-  },
-  {
-    id: 'prod_silver_oak_blend',
-    title: 'SILVER OAK BLEND - MEDIUM ROAST',
-    subtitle: 'Hazelnut, Honey, Crisp Green Apple, balanced morning brew',
-    price: '₹ 520',
-    imageUrl: 'https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=600&auto=format&fit=crop&q=80',
-    productUrl: '/product/prod_silver_oak_blend',
-  },
-  {
-    id: 'prod_vienna_roast',
-    title: 'VIENNA ROAST - DEEP & SMOKY',
-    subtitle: 'Cocoa nibs, Burnt Caramel, Toasted walnut, heavy crema',
-    price: '₹ 530',
-    badge: 'POPULAR',
-    imageUrl: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=600&auto=format&fit=crop&q=80',
-    productUrl: '/product/prod_vienna_roast',
-  },
-  {
-    id: 'prod_cold_brew_blend',
-    title: 'SUMMER COLD BREW BLEND - COARSE',
-    subtitle: 'Sweet citrus, Milk Chocolate, stone fruits, low acidity',
-    price: '₹ 580',
-    imageUrl: 'https://images.unsplash.com/photo-1517668808822-9ebb02f2a0e6?w=600&auto=format&fit=crop&q=80',
-    productUrl: '/product/prod_cold_brew_blend',
-  },
-];
+import { fetchProducts } from '@/lib/catalogApi';
 
 const TESTIMONIALS: TestimonialItem[] = [
   {
@@ -129,6 +85,28 @@ const TESTIMONIALS: TestimonialItem[] = [
 export default function HomePage() {
   const router = useRouter();
   const [clearanceInput, setClearanceInput] = useState<string>('45');
+  const [bestsellerProducts, setBestsellerProducts] = useState<SliderProduct[]>([]);
+
+  React.useEffect(() => {
+    async function loadBestsellers() {
+      try {
+        const items = await fetchProducts({ limit: 8 });
+        const sliderItems: SliderProduct[] = items.map((p) => ({
+          id: p.id,
+          title: p.name.toUpperCase(),
+          subtitle: p.tasteNotes && p.tasteNotes.length > 0 ? p.tasteNotes.join(', ') : p.description,
+          price: `₹ ${(p.priceCents / 100).toLocaleString('en-IN')}`,
+          imageUrl: p.image,
+          badge: p.badge,
+          productUrl: `/product/${p.id}`,
+        }));
+        setBestsellerProducts(sliderItems);
+      } catch (err) {
+        console.error('Failed to load bestsellers from catalog service:', err);
+      }
+    }
+    loadBestsellers();
+  }, []);
 
   return (
     <>
@@ -223,15 +201,15 @@ export default function HomePage() {
           <ProductSlider
             title="Bestseller Coffees"
             subtitle="Freshly roasted specialty coffee beans and cold brew drops from India's premier estates"
-            products={BESTSELLER_PRODUCTS}
+            products={bestsellerProducts}
             onBuyNow={(prod) => {
-              router.push('/checkout');
+              router.push(prod.productUrl || `/product/${prod.id}`);
             }}
             onQuickAdd={(prod) => {
               router.push('/cart');
             }}
             onProductClick={(prod) => {
-              router.push('/coffees');
+              router.push(prod.productUrl || `/product/${prod.id}`);
             }}
           />
         </section>
