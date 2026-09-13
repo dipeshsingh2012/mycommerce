@@ -47,6 +47,34 @@ export interface CatalogProduct {
   taste_notes?: string[] | null;
   recommended_brew_methods?: string[] | null;
   variants?: CatalogVariant[] | null;
+  images?: Array<{ position: number; src: string }> | null;
+  specs_json?: string | null;
+}
+
+export interface BrewGuideItem {
+  method: string;
+  time: string;
+  dose: string;
+  water: string;
+  temp: string;
+  grind: string;
+  ratio?: string;
+  steps: string[];
+}
+
+export interface CoffeeSpecsData {
+  coordinates?: { lat: string; lng: string };
+  sensory_scales?: { acidity: number; sweetness: number; body: number; bitterness: number; roast_level: number };
+  estate_details?: {
+    name: string;
+    location: string;
+    heritage: string;
+    certifications?: string[];
+  };
+  origin_story?: string;
+  resting_note?: string;
+  brew_guides?: BrewGuideItem[];
+  [key: string]: any;
 }
 
 export interface ProductItem {
@@ -63,12 +91,24 @@ export interface ProductItem {
   specs?: Record<string, string>;
   description: string;
   image: string;
+  images?: Array<{ position: number; src: string }>;
   inStock?: boolean;
   roastLevel?: string;
   estateName?: string;
   processMethod?: string;
   slug?: string;
+  elevationM?: number;
+  varietal?: string;
+  region?: string;
+  restingPeriodDays?: number;
+  acidity?: string;
+  bitterness?: string;
+  body?: string;
+  bestEnjoyed?: string;
+  variants?: CatalogVariant[];
+  specsData?: CoffeeSpecsData;
 }
+
 
 const CATALOG_API_URL =
   process.env.CATALOG_API_URL ||
@@ -140,7 +180,7 @@ export const FALLBACK_CATALOG_PRODUCTS: CatalogProduct[] = [
   },
   {
     id: 'prod_baarbara_whiskey',
-    name: 'Baarbara Estate - Whiskey Barrel Aged (250g)',
+    name: 'Baarbara Estate - Whiskey Barrel Aged',
     brand: 'Hiljhil Roasters',
     sku: 'HJ-BB-250',
     category: 'coffee_beans',
@@ -148,26 +188,116 @@ export const FALLBACK_CATALOG_PRODUCTS: CatalogProduct[] = [
     compare_at_price: 1400.0,
     status: 'active',
     tax_category: 'standard',
-    badge: 'Limited Reserve',
+    badge: 'Exclusive Lot',
     in_stock: true,
     rating: 4.95,
-    review_count: 67,
+    review_count: 128,
     roast_level: 'Medium',
     estate_name: 'Baarbara Estate',
-    elevation_m: 1550,
-    process_method: 'Oak Barrel Aged Natural',
-    region: 'Chikmagalur, Western Ghats',
-    varietal: 'SLN 795',
-    taste_notes: ['Vanilla Oak', 'Peated Malt', 'Dried Plum'],
+    elevation_m: 1450,
+    process_method: 'Oak Whiskey Barrel Aged Washed',
+    region: 'Baba Budangiri, Chikmagalur, Karnataka',
+    varietal: 'Arabica S795',
+    resting_period_days: 10,
+    acidity: 'medium',
+    bitterness: 'low',
+    body: 'Layered and Complex',
+    best_enjoyed: 'black',
+    taste_notes: ['Ripe Banana', 'Red Plum', 'Whiskey Oak', 'Cocoa', 'Sweet Cardamom', 'Irish Cream'],
+    recommended_brew_methods: ['aeropress', 'pour_over', 'moka_pot', 'cold_brew'],
+    variants: [
+      { size: '250g', weight_grams: 250, price: 1250.0, compare_at_price: 1400.0, sku: 'HJ-BB-250', available: true },
+      { size: '500g', weight_grams: 500, price: 2350.0, compare_at_price: 2800.0, sku: 'HJ-BB-500', available: true },
+      { size: '1kg', weight_grams: 1000, price: 4400.0, compare_at_price: 5600.0, sku: 'HJ-BB-1KG', available: true },
+    ],
     width_cm: 10.0,
     height_cm: 20.0,
     depth_cm: 6.0,
     top_clearance_cm: 0.0,
     side_clearance_cm: 0.0,
     rear_clearance_cm: 0.0,
-    image_url: 'https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=800&auto=format&fit=crop&q=80',
-    description: 'Conditioned in charred oak single-malt whiskey barrels for 45 days prior to drum roasting. Ultra-rich aromatics without alcoholic content.',
+    image_url: 'https://cdn.shopify.com/s/files/1/0738/1409/files/1_6.jpg?v=1787560255',
+    images: [
+      { position: 1, src: 'https://cdn.shopify.com/s/files/1/0738/1409/files/1_6.jpg?v=1787560255' },
+      { position: 2, src: 'https://cdn.shopify.com/s/files/1/0738/1409/files/WEB_-100_4.jpg?v=1787741398' },
+      { position: 3, src: 'https://cdn.shopify.com/s/files/1/0738/1409/files/2_1_7d258e8c-67e8-48b7-9745-98ac3b51d065.jpg?v=1787560255' },
+    ],
+    description: 'This coffee’s journey began at Baarbara Estate in the foothills of Baba Budangiri, the origin of coffee in India. Aged for nearly four months in freshly emptied malt whiskey oak barrels in a controlled microclimate, turned every few days and cupped regularly. Yields wine-like aromas, sweet cardamom, whiskey oak, and a lingering Irish cream finish. 100% non-alcoholic.',
     slug: 'baarbara-estate-whiskey-barrel-aged',
+    specs_json: JSON.stringify({
+      coordinates: { lat: '13.4062° N', lng: '75.7686° E' },
+      sensory_scales: { acidity: 2.5, sweetness: 4.5, body: 4.0, bitterness: 2.0, roast_level: 3.0 },
+      estate_details: {
+        name: 'Baarbara Estate',
+        location: 'Chikmagalur, Karnataka',
+        heritage: 'Run by the 3rd generation of seasoned Chikmagalur coffee cultivators from the Indavara family (MG Plantations) with 120+ years of coffee heritage.',
+        certifications: ['UTZ Certified', 'Rainforest Alliance', 'Shade Grown Canopy'],
+      },
+      origin_story: 'This coffee’s journey began at Baarbara Estate in the foothills of Baba Budangiri, the origin of coffee in India. It was shaped by a process the estate has spent years refining: aged for nearly four months in freshly emptied malt whiskey oak barrels housed in a covered, temperature-controlled cellar away from sunlight. The barrels were carefully turned every few days, allowing the beans to absorb rich vanilla oak aromas while preserving coffee terroir. Note: 100% Non-alcoholic.',
+      resting_note: 'Recommended resting period: 10 days from roast date for optimal degassing and flavor clarity.',
+      brew_guides: [
+        {
+          method: 'AeroPress',
+          time: '2:30 MINS',
+          dose: '18G',
+          water: '230ML',
+          temp: '92°C',
+          grind: 'Medium-Fine',
+          ratio: '1:12.8',
+          steps: [
+            'Rinse paper filter and preheat AeroPress cylinder with hot water.',
+            'Add 18g medium-fine coffee grounds in standard position.',
+            'Pour 60ml of 92°C water and stir gently for 30s bloom.',
+            'Fill to 230ml, attach plunger, and press gently for 45 seconds.',
+          ],
+        },
+        {
+          method: 'Pour Over',
+          time: '3:15 MINS',
+          dose: '15G',
+          water: '250ML',
+          temp: '93°C',
+          grind: 'Medium',
+          ratio: '1:16.7',
+          steps: [
+            'Rinse paper filter with boiling water to remove paper taste.',
+            'Add 15g medium grounds, leveling the bed.',
+            'Pour 50ml bloom water and pause 45 seconds for degassing.',
+            'Pour remaining 200ml in steady spiral concentric circles, finishing drawdown by 3:15.',
+          ],
+        },
+        {
+          method: 'Moka Pot',
+          time: '2:45 MINS',
+          dose: '18G',
+          water: '120ML',
+          temp: '50°C (Preheated)',
+          grind: 'Fine-Medium',
+          ratio: '1:6.7',
+          steps: [
+            'Fill lower chamber with preheated water up to the safety valve.',
+            'Fill funnel basket with 18g coffee without tamping.',
+            'Place on low-medium flame; remove immediately when golden hazel flow foams.',
+            'Cool base under cold tap water to stop extraction.',
+          ],
+        },
+        {
+          method: 'Cold Brew',
+          time: '16:00 HRS',
+          dose: '50G',
+          water: '450ML',
+          temp: 'Chilled Water',
+          grind: 'Coarse',
+          ratio: '1:9.0',
+          steps: [
+            'Combine 50g coarse grounds with 450ml cold filtered water in an airtight jar.',
+            'Gently stir to ensure even saturation.',
+            'Steep in refrigerator for 16-18 hours.',
+            'Strain through cloth/paper filter and serve over ice with an orange twist.',
+          ],
+        },
+      ],
+    }),
   },
   {
     id: 'prod_attikan_estate',
@@ -436,6 +566,15 @@ export function transformCatalogProduct(prod: CatalogProduct): ProductItem {
     if (prod.varietal) specs['Varietal'] = prod.varietal;
   }
 
+  let parsedSpecsData: CoffeeSpecsData | undefined = undefined;
+  if (prod.specs_json) {
+    try {
+      parsedSpecsData = JSON.parse(prod.specs_json);
+    } catch {
+      parsedSpecsData = undefined;
+    }
+  }
+
   return {
     id: prod.id,
     name: prod.name,
@@ -450,11 +589,22 @@ export function transformCatalogProduct(prod: CatalogProduct): ProductItem {
     specs,
     description: prod.description || '',
     image: prod.image_url || 'https://images.unsplash.com/photo-1587734195503-904fca47e0e9?w=800',
+    images: prod.images || undefined,
     inStock: prod.in_stock,
     roastLevel: prod.roast_level || undefined,
     estateName: prod.estate_name || undefined,
     processMethod: prod.process_method || undefined,
     slug: prod.slug,
+    elevationM: prod.elevation_m || undefined,
+    varietal: prod.varietal || undefined,
+    region: prod.region || undefined,
+    restingPeriodDays: prod.resting_period_days || undefined,
+    acidity: prod.acidity || undefined,
+    bitterness: prod.bitterness || undefined,
+    body: prod.body || undefined,
+    bestEnjoyed: prod.best_enjoyed || undefined,
+    variants: prod.variants || undefined,
+    specsData: parsedSpecsData,
   };
 }
 
