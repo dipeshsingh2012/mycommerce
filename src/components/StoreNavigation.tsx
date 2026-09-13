@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { PromoBar, NavigationHeader, NavLinkItem } from '@dipesh.singh/commerce-ui';
 import { Footer } from './Footer';
 import { ProtonThemeProvider } from '@dipesh.singh/proton/react';
 import { CheckCircle2, X, ShoppingBag } from 'lucide-react';
+import { fetchActiveTheme, DEFAULT_STORE_THEME, ThemeConfig } from '../lib/contentApi';
 
 const STORE_NAV_LINKS: NavLinkItem[] = [
   {
@@ -56,8 +57,31 @@ interface StoreNavigationProps {
 export const StoreNavigation: React.FC<StoreNavigationProps> = ({ children }) => {
   const router = useRouter();
   const pathname = usePathname();
+  const [theme, setTheme] = useState<ThemeConfig>(DEFAULT_STORE_THEME);
   const [cartCount, setCartCount] = useState<number>(2);
   const [toastMessage, setToastMessage] = useState<{ text: string; actionText?: string; actionRoute?: string } | null>(null);
+
+  // Sync theme from Cloud Run content-service and listen for live CMS preview messages
+  useEffect(() => {
+    let isMounted = true;
+    fetchActiveTheme().then((activeTheme) => {
+      if (isMounted && activeTheme) {
+        setTheme(activeTheme);
+      }
+    });
+
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data?.type === 'PIM_THEME_UPDATED' && event.data.theme) {
+        setTheme(event.data.theme);
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+    return () => {
+      isMounted = false;
+      window.removeEventListener('message', handleMessage);
+    };
+  }, []);
 
   const showToast = (text: string, actionText?: string, actionRoute?: string) => {
     setToastMessage({ text, actionText, actionRoute });
@@ -66,14 +90,31 @@ export const StoreNavigation: React.FC<StoreNavigationProps> = ({ children }) =>
     }, 4500);
   };
 
+  const fontClass =
+    theme.font_family === 'serif'
+      ? 'font-serif'
+      : theme.font_family === 'mono'
+      ? 'font-mono'
+      : 'font-sans';
+
   return (
     <ProtonThemeProvider>
-      <div className="min-h-screen bg-slate-50 flex flex-col selection:bg-amber-700 selection:text-white">
+      <div
+        className={`min-h-screen flex flex-col transition-colors duration-300 ${fontClass}`}
+        style={{
+          backgroundColor: theme.background_color || '#f8fafc',
+          color: theme.text_color || '#0f172a',
+        }}
+      >
         {/* Global Announcement PromoBar */}
         <PromoBar
-          message="Get 10% off on your first coffee purchase, use code -"
+          message={
+            theme.badge_text
+              ? `${theme.badge_text} · Get 10% off on your first order with code -`
+              : 'Get 10% off on your first coffee purchase, use code -'
+          }
           promoCode="COFFEE10"
-          tag="WELCOME"
+          tag={theme.badge_text || 'WELCOME'}
           variant="coffee"
           onCopyCode={(code) => showToast(`Copied promo coupon code: ${code}`)}
         />
@@ -111,7 +152,8 @@ export const StoreNavigation: React.FC<StoreNavigationProps> = ({ children }) =>
               <button
                 type="button"
                 onClick={() => router.push(toastMessage.actionRoute!)}
-                className="ml-2 px-2.5 py-1 bg-amber-700 hover:bg-amber-600 text-white rounded-lg text-[11px] font-bold transition-colors flex items-center gap-1"
+                className="ml-2 px-2.5 py-1 text-white rounded-lg text-[11px] font-bold transition-colors flex items-center gap-1 shadow-xs"
+                style={{ backgroundColor: theme.primary_color || '#92400e' }}
               >
                 <ShoppingBag className="w-3 h-3" />
                 {toastMessage.actionText}
@@ -129,7 +171,7 @@ export const StoreNavigation: React.FC<StoreNavigationProps> = ({ children }) =>
 
         {/* Storefront Footer */}
         <Footer
-          brandName="HILJHIL ROASTERS"
+          brandName="HILL JHIL ROASTERS"
           onNewsletterSubmit={async (email) => {
             await new Promise((r) => setTimeout(r, 600));
             showToast(`Thank you for subscribing with ${email}!`);
