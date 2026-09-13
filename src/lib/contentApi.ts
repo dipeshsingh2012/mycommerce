@@ -34,7 +34,7 @@ export const DEFAULT_STORE_THEME: ThemeConfig = {
 const CONTENT_API_URL =
   process.env.CONTENT_API_URL ||
   process.env.NEXT_PUBLIC_CONTENT_API_URL ||
-  'https://content-service-518971663061.us-central1.run.app/api/v1';
+  'https://content-service-fzdcrf2fxq-uc.a.run.app/api/v1';
 
 export async function fetchActiveTheme(): Promise<ThemeConfig> {
   if (CONTENT_API_URL) {
