@@ -416,8 +416,9 @@ export const App: React.FC = () => {
         {/* Global Retail Navigation Header */}
         <NavigationHeader
           logo={{
-            text: 'HILJHIL CAFE',
-            tagline: 'Specialty Coffee Roasters',
+            imageUrl: '/logo.jpg',
+            text: 'HILL JHIL',
+            tagline: 'Himalayan Alpine Sourced · Pure Mountain Roast',
             href: '#/',
           }}
           links={STORE_NAV_LINKS}
