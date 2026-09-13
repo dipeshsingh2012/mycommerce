@@ -57,11 +57,11 @@ export const Footer: React.FC<FooterProps> = ({
           <div className="lg:col-span-3 space-y-6">
             <Link href="/" className="inline-block group">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-amber-700/20 border border-amber-500/30 text-amber-400 flex items-center justify-center font-serif font-black shadow-xs group-hover:bg-amber-600/30 transition-colors">
-                  <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
-                    <path d="M20 3H4v10c0 2.21 1.79 4 4 4h6c2.21 0 4-1.79 4-4v-3h2c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 5h-2V5h2v3zM4 19h16v2H4z" />
-                  </svg>
-                </div>
+                <img
+                  src="/logo.jpg"
+                  alt="Hill Jhil"
+                  className="w-10 h-10 rounded-full object-cover border border-amber-500/40 shadow-xs group-hover:border-amber-400 transition-colors shrink-0"
+                />
                 <div>
                   <h3 className="font-serif font-bold text-base sm:text-lg tracking-tight text-white uppercase leading-tight">
                     {brandName}
