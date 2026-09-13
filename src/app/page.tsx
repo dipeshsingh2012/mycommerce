@@ -5,8 +5,9 @@ import HomeClient from './HomeClient';
 export const dynamic = 'force-dynamic';
 
 export default async function HomePage() {
-  const items = await fetchProducts({ limit: 8 });
-  const sliderItems: SliderProduct[] = items.map((p) => ({
+  const allProducts = await fetchProducts({ limit: 50 });
+  const coffees = allProducts.filter((p) => p.category !== 'equipment');
+  const sliderItems: SliderProduct[] = coffees.map((p) => ({
     id: p.id,
     title: p.name.toUpperCase(),
     subtitle: p.tasteNotes && p.tasteNotes.length > 0 ? p.tasteNotes.join(', ') : p.description,

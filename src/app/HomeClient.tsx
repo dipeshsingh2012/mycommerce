@@ -8,11 +8,11 @@ import { ProtonButton } from '@dipesh.singh/proton/react';
 import {
   HeroBanner,
   CategoryLane,
-  ProductSlider,
   CategoryTileItem,
   SliderProduct,
   TestimonialItem,
 } from '@dipesh.singh/commerce-ui';
+import { ProductSlider } from '../components/ProductSlider';
 import { TestimonialsSection } from '../components/TestimonialsSection';
 
 const CATEGORY_TILES: CategoryTileItem[] = [
@@ -184,13 +184,16 @@ export default function HomeClient({ initialBestsellers }: HomeClientProps) {
             title="Bestseller Coffees"
             subtitle="Freshly roasted specialty coffee beans and cold brew drops from India's premier estates"
             products={bestsellerProducts}
-            onBuyNow={(prod) => {
+            onBuyNow={(prod, e) => {
+              e?.preventDefault();
               router.push(prod.productUrl || `/product/${prod.id}`);
             }}
-            onQuickAdd={(prod) => {
+            onQuickAdd={(prod, e) => {
+              e?.preventDefault();
               router.push('/cart');
             }}
-            onProductClick={(prod) => {
+            onProductClick={(prod, e) => {
+              e?.preventDefault();
               router.push(prod.productUrl || `/product/${prod.id}`);
             }}
           />

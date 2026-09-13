@@ -21,6 +21,6 @@
 
 ```bash
 npm install
-npm run dev     # Starts host shell on http://localhost:5170
+npm run dev     # Starts storefront shell on port 5170
 npm run build   # Compiles production distribution
 ```
