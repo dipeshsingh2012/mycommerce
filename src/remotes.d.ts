@@ -126,13 +126,4 @@ declare module 'testimonialsUi/TestimonialCard' {
   export default TestimonialCard;
 }
 
-declare module 'upsellRemote/UpsellWidget' {
-  import React from 'react';
-  export interface UpsellWidgetProps {
-    productId?: string;
-    onAddToCart?: (item: any) => void;
-    className?: string;
-  }
-  export const UpsellWidget: React.FC<UpsellWidgetProps>;
-  export default UpsellWidget;
-}
+
