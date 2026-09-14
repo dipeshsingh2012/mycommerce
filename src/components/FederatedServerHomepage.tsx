@@ -9,15 +9,15 @@ interface FederatedServerHomepageProps {
 const CLIENT_MFE_URL =
   process.env.NEXT_PUBLIC_MFE_HOMEPAGE_URL ||
   process.env.VITE_MFE_HOMEPAGE_URL ||
-  'http://localhost:5174/assets/remoteEntry.js';
+  'https://storage.googleapis.com/mycommerce/mfes/homepage-ui/assets/remoteEntry.js';
 
 const SSR_MFE_URL =
   process.env.MFE_HOMEPAGE_SSR_URL ||
-  'http://localhost:5174/dist/server/HomepageFragment.js';
+  'https://storage.googleapis.com/mycommerce/mfes/homepage-ui/server/HomepageFragment.js';
 
 const CSS_MFE_URL =
   process.env.MFE_HOMEPAGE_CSS_URL ||
-  'http://localhost:5174/assets/style-D-OXGWNf.css';
+  'https://storage.googleapis.com/mycommerce/mfes/homepage-ui/style-D-OXGWNf.css';
 
 export function FederatedServerHomepage({
   initialContent,
