@@ -1,6 +1,7 @@
 import React from 'react';
 import type { Metadata } from 'next';
 import { FederatedServerProductPage } from '@/components/FederatedServerProductPage';
+import { fetchProductByIdOrSlug } from '@/lib/catalogApi';
 
 export const dynamic = 'force-dynamic';
 
@@ -9,12 +10,14 @@ interface PageProps {
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const product = await fetchProductByIdOrSlug(params.id);
   return {
-    title: `Product Details | Hiljhil Cafe`,
-    description: 'Specialty coffee roasts and precision barista equipment.',
+    title: product ? `${product.name} | Hiljhil Cafe` : 'Product Details | Hiljhil Cafe',
+    description: product?.description || 'Specialty coffee roasts and precision barista equipment.',
   };
 }
 
-export default function ProductPage({ params }: PageProps) {
-  return <FederatedServerProductPage productId={params.id} />;
+export default async function ProductPage({ params }: PageProps) {
+  const product = await fetchProductByIdOrSlug(params.id);
+  return <FederatedServerProductPage productId={params.id} initialProduct={product} />;
 }
