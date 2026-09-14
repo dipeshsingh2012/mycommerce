@@ -15,6 +15,27 @@ export interface ThemeConfig {
   updated_at?: string;
 }
 
+export interface CMSPageSection {
+  id: string;
+  type: 'hero_banner' | 'promo_callout' | 'feature_grid' | 'rich_text' | 'testimonials' | 'category_lane' | 'product_lane' | string;
+  title: string;
+  subtitle?: string;
+  is_active: boolean;
+  sort_order: number;
+  config: Record<string, any>;
+}
+
+export interface CMSPage {
+  id: string;
+  page_type: string;
+  title: string;
+  slug: string;
+  description?: string;
+  is_published: boolean;
+  sections: CMSPageSection[];
+  updated_at?: string;
+}
+
 export const DEFAULT_STORE_THEME: ThemeConfig = {
   id: 'theme_hill_jhil_alpine',
   name: 'Hill Jhil Alpine Tarn',
@@ -54,4 +75,25 @@ export async function fetchActiveTheme(): Promise<ThemeConfig> {
   }
 
   return DEFAULT_STORE_THEME;
+}
+
+export async function fetchCmsPage(slug: string): Promise<CMSPage | null> {
+  if (CONTENT_API_URL) {
+    try {
+      const cleanSlug = slug.replace(/^\/+/, '');
+      const res = await fetch(`${CONTENT_API_URL}/cms/pages/${cleanSlug}`, {
+        next: { revalidate: 60 },
+        signal: AbortSignal.timeout(3500),
+      });
+
+      if (res.ok) {
+        const page: CMSPage = await res.json();
+        return page;
+      }
+    } catch (err) {
+      console.warn(`[contentApi] Failed to fetch CMS page "${slug}" from ${CONTENT_API_URL}:`, err);
+    }
+  }
+
+  return null;
 }
