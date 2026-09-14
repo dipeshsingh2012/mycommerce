@@ -44,3 +44,4 @@ export function FederatedSearchModal({ isOpen, onClose }: FederatedSearchModalPr
     />
   );
 }
+

@@ -95,11 +95,13 @@ export function FederatedHydrator({
         }
 
         const factory = await container.get(moduleName);
-        const mod = factory();
+        const mod = typeof factory === 'function' ? await factory() : await factory;
 
         let Resolved: ComponentType<any> | null = null;
         if (componentExportName && typeof mod?.[componentExportName] === 'function') {
           Resolved = mod[componentExportName];
+        } else if (componentExportName && typeof mod?.default?.[componentExportName] === 'function') {
+          Resolved = mod.default[componentExportName];
         } else if (typeof mod?.default === 'function') {
           Resolved = mod.default;
         } else if (typeof mod === 'function') {
