@@ -36,34 +36,49 @@ function findHostNodeModules(): string | null {
 }
 
 function getCacheDir(): string {
-  let cacheDir: string;
-  const projectCacheDir = path.resolve(process.cwd(), '.next/cache/mfe-ssr');
-  try {
-    if (!fs.existsSync(projectCacheDir)) {
-      fs.mkdirSync(projectCacheDir, { recursive: true });
+  // In serverless environments (Vercel, AWS Lambda, Cloud Functions), process.cwd() is read-only.
+  // We prioritize the writable OS temporary directory to guarantee error-free caching and importing.
+  const isServerless = Boolean(
+    process.env.VERCEL ||
+    process.env.AWS_LAMBDA_FUNCTION_NAME ||
+    process.env.LAMBDA_TASK_ROOT
+  );
+
+  if (!isServerless) {
+    const projectCacheDir = path.resolve(process.cwd(), '.next/cache/mfe-ssr');
+    try {
+      if (!fs.existsSync(projectCacheDir)) {
+        fs.mkdirSync(projectCacheDir, { recursive: true });
+      }
+      fs.accessSync(projectCacheDir, fs.constants.W_OK);
+
+      const hostNodeModules = findHostNodeModules();
+      if (hostNodeModules) {
+        const cacheNodeModules = path.join(projectCacheDir, 'node_modules');
+        if (!fs.existsSync(cacheNodeModules)) {
+          try {
+            fs.symlinkSync(hostNodeModules, cacheNodeModules, 'junction');
+          } catch {
+            // ignore symlink errors
+          }
+        }
+      }
+      return projectCacheDir;
+    } catch {
+      // Fall through to tmp directory
     }
-    cacheDir = projectCacheDir;
-  } catch {
-    const tmpCacheDir = path.join(os.tmpdir(), 'mycommerce-mfe-ssr');
+  }
+
+  const tmpCacheDir = path.join(os.tmpdir(), 'mycommerce-mfe-ssr');
+  try {
     if (!fs.existsSync(tmpCacheDir)) {
       fs.mkdirSync(tmpCacheDir, { recursive: true });
     }
-    cacheDir = tmpCacheDir;
+    return tmpCacheDir;
+  } catch (err) {
+    console.warn('[mfeServerLoader] Failed creating tmpCacheDir, falling back to os.tmpdir():', err);
+    return os.tmpdir();
   }
-
-  const hostNodeModules = findHostNodeModules();
-  if (hostNodeModules) {
-    const cacheNodeModules = path.join(cacheDir, 'node_modules');
-    if (!fs.existsSync(cacheNodeModules)) {
-      try {
-        fs.symlinkSync(hostNodeModules, cacheNodeModules, 'junction');
-      } catch {
-        // ignore symlink errors if already linked or not supported
-      }
-    }
-  }
-
-  return cacheDir;
 }
 
 /**

@@ -1,7 +1,8 @@
 import React from 'react';
 import type { Metadata } from 'next';
 import { FederatedServerProductPage } from '@/components/FederatedServerProductPage';
-import { fetchProductByIdOrSlug } from '@/lib/catalogApi';
+import { CompatibleAccessoriesSection } from '@/components/CompatibleAccessoriesSection';
+import { fetchProductByIdOrSlug, fetchCompatibleAccessories } from '@/lib/catalogApi';
 
 export const dynamic = 'force-dynamic';
 
@@ -19,5 +20,27 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function ProductPage({ params }: PageProps) {
   const product = await fetchProductByIdOrSlug(params.id);
-  return <FederatedServerProductPage productId={params.id} initialProduct={product} />;
+  const accessories = product ? await fetchCompatibleAccessories(product) : [];
+
+  let collarDiameter = '54mm';
+  if (product?.specs_json) {
+    try {
+      const sp = JSON.parse(product.specs_json);
+      if (sp.collar_diameter) collarDiameter = sp.collar_diameter;
+    } catch {}
+  }
+
+  return (
+    <div className="pb-16">
+      <FederatedServerProductPage productId={params.id} initialProduct={product} />
+      {product && accessories.length > 0 && (
+        <CompatibleAccessoriesSection
+          machineName={product.name}
+          collarDiameter={collarDiameter}
+          accessories={accessories}
+        />
+      )}
+    </div>
+  );
 }
+
