@@ -34,3 +34,4 @@ export function FederatedCheckout({ cartId = 'cart_active_session' }: FederatedC
     />
   );
 }
+

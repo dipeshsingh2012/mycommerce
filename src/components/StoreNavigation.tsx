@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { PromoBar, NavigationHeader, NavLinkItem } from '@dipesh.singh/commerce-ui';
 import { Footer } from './Footer';
+import { FederatedSearchModal } from './FederatedSearchModal';
 import { ProtonThemeProvider } from '@dipesh.singh/proton/react';
 import { CheckCircle2, X, ShoppingBag } from 'lucide-react';
 import { fetchActiveTheme, DEFAULT_STORE_THEME, ThemeConfig } from '../lib/contentApi';
@@ -60,6 +61,19 @@ export const StoreNavigation: React.FC<StoreNavigationProps> = ({ children }) =>
   const [theme, setTheme] = useState<ThemeConfig>(DEFAULT_STORE_THEME);
   const [cartCount, setCartCount] = useState<number>(2);
   const [toastMessage, setToastMessage] = useState<{ text: string; actionText?: string; actionRoute?: string } | null>(null);
+  const [isSearchOpen, setIsSearchOpen] = useState<boolean>(false);
+
+  // Global ⌘K / Ctrl+K keyboard shortcut for Search Modal
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setIsSearchOpen((prev) => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   // Sync theme from Cloud Run content-service and listen for live CMS preview messages
   useEffect(() => {
@@ -146,9 +160,15 @@ export const StoreNavigation: React.FC<StoreNavigationProps> = ({ children }) =>
             onClick: () => router.push('/subscriptions'),
           }}
           cartCount={cartCount}
-          onSearchClick={() => router.push('/coffees')}
+          onSearchClick={() => setIsSearchOpen(true)}
           onAccountClick={() => showToast('Demo Account Profile: Highland District Club Member')}
           onCartClick={() => router.push('/cart')}
+        />
+
+        {/* Federated Search Modal (searchUi MFE) */}
+        <FederatedSearchModal
+          isOpen={isSearchOpen}
+          onClose={() => setIsSearchOpen(false)}
         />
 
         {/* Main Page Viewport */}
