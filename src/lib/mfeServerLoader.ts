@@ -22,20 +22,48 @@ interface CacheEntry {
 const inMemoryModuleCache = new Map<string, CacheEntry>();
 const inFlightPromises = new Map<string, Promise<any>>();
 
+function findHostNodeModules(): string | null {
+  const candidates = [
+    path.resolve(process.cwd(), 'node_modules'),
+    path.resolve(process.cwd(), '../node_modules'),
+  ];
+  for (const c of candidates) {
+    if (fs.existsSync(c)) {
+      return c;
+    }
+  }
+  return null;
+}
+
 function getCacheDir(): string {
+  let cacheDir: string;
   const projectCacheDir = path.resolve(process.cwd(), '.next/cache/mfe-ssr');
   try {
     if (!fs.existsSync(projectCacheDir)) {
       fs.mkdirSync(projectCacheDir, { recursive: true });
     }
-    return projectCacheDir;
+    cacheDir = projectCacheDir;
   } catch {
     const tmpCacheDir = path.join(os.tmpdir(), 'mycommerce-mfe-ssr');
     if (!fs.existsSync(tmpCacheDir)) {
       fs.mkdirSync(tmpCacheDir, { recursive: true });
     }
-    return tmpCacheDir;
+    cacheDir = tmpCacheDir;
   }
+
+  const hostNodeModules = findHostNodeModules();
+  if (hostNodeModules) {
+    const cacheNodeModules = path.join(cacheDir, 'node_modules');
+    if (!fs.existsSync(cacheNodeModules)) {
+      try {
+        fs.symlinkSync(hostNodeModules, cacheNodeModules, 'junction');
+      } catch {
+        // ignore symlink errors if already linked or not supported
+      }
+    }
+  }
+
+  return cacheDir;
 }
 
 /**
