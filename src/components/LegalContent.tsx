@@ -93,3 +93,4 @@ export const LegalContent: React.FC<LegalContentProps> = ({ type }) => {
 };
 
 export default LegalContent;
+

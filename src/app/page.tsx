@@ -11,24 +11,5 @@ export const metadata: Metadata = {
 };
 
 export default function HomePage() {
-  return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            '@context': 'https://schema.org',
-            '@type': 'Organization',
-            name: 'Hiljhil Roasters & Cafe',
-            url: 'https://hiljhil.com',
-            logo: 'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=300',
-            description:
-              'Artisanal batch-roasted specialty coffees, single-estate roasts, and precision barista equipment.',
-          }),
-        }}
-      />
-      <FederatedServerHomepage />
-    </>
-  );
+  return <FederatedServerHomepage />;
 }
-

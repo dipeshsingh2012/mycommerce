@@ -51,17 +51,6 @@ export interface CatalogProduct {
   specs_json?: string | null;
 }
 
-export interface BrewGuideItem {
-  method: string;
-  time: string;
-  dose: string;
-  water: string;
-  temp: string;
-  grind: string;
-  ratio?: string;
-  steps: string[];
-}
-
 export interface CoffeeSpecsData {
   coordinates?: { lat: string; lng: string };
   sensory_scales?: { acidity: number; sweetness: number; body: number; bitterness: number; roast_level: number };
@@ -73,7 +62,16 @@ export interface CoffeeSpecsData {
   };
   origin_story?: string;
   resting_note?: string;
-  brew_guides?: BrewGuideItem[];
+  brew_guides?: Array<{
+    method: string;
+    time: string;
+    dose: string;
+    water: string;
+    temp: string;
+    grind: string;
+    ratio?: string;
+    steps: string[];
+  }>;
   [key: string]: any;
 }
 
@@ -109,501 +107,52 @@ export interface ProductItem {
   specsData?: CoffeeSpecsData;
 }
 
-
 const CATALOG_API_URL =
   process.env.CATALOG_API_URL ||
   process.env.NEXT_PUBLIC_CATALOG_API_URL ||
-  '';
+  'https://product-catalog-service-fzdcrf2fxq-uc.a.run.app/api/v1';
 
-export const FALLBACK_CATALOG_PRODUCTS: CatalogProduct[] = [
-  {
-    id: 'prod_hiljhil_guji',
-    name: 'Ethiopian Guji Single Origin (250g)',
-    brand: 'Hiljhil Roasters',
-    sku: 'HJ-GUJI-250',
-    category: 'coffee_beans',
-    price: 950.0,
-    compare_at_price: 1100.0,
-    status: 'active',
-    tax_category: 'standard',
-    badge: 'Direct Trade',
-    in_stock: true,
-    rating: 4.9,
-    review_count: 142,
-    roast_level: 'Light-Medium',
-    estate_name: 'Shakiso Farm',
-    elevation_m: 2150,
-    process_method: 'Heirloom Natural',
-    region: 'Guji Zone, Oromia',
-    varietal: 'Indigenous Heirloom',
-    taste_notes: ['Wild Lavender', 'Ripe Nectarine', 'Bergamot Tea'],
-    width_cm: 10.0,
-    height_cm: 20.0,
-    depth_cm: 6.0,
-    top_clearance_cm: 0.0,
-    side_clearance_cm: 0.0,
-    rear_clearance_cm: 0.0,
-    image_url: 'https://images.unsplash.com/photo-1587734195503-904fca47e0e9?w=800&auto=format&fit=crop&q=80',
-    description: 'Direct-trade heirloom lot from Shakiso in Guji. Crisp floral aromatics giving way to ripe nectarine sweetness and a lingering honey-bergamot finish.',
-    slug: 'ethiopian-guji-single-origin',
-  },
-  {
-    id: 'prod_hiljhil_espresso_blend',
-    name: 'Highland Dark Peak Espresso Blend (500g)',
-    brand: 'Hiljhil Roasters',
-    sku: 'HJ-DPE-500',
-    category: 'coffee_beans',
-    price: 850.0,
-    compare_at_price: 950.0,
-    status: 'active',
-    tax_category: 'standard',
-    badge: 'Signature Blend',
-    in_stock: true,
-    rating: 5.0,
-    review_count: 289,
-    roast_level: 'Medium-Dark',
-    estate_name: 'Hiljhil Blend (Colombia / Sumatra)',
-    elevation_m: 1800,
-    process_method: 'Washed & Wet-Hulled',
-    region: 'Huila & Mandheling',
-    varietal: 'Castillo, Typica',
-    taste_notes: ['Dark Chocolate', 'Candied Walnut', 'Velvety Crema'],
-    width_cm: 12.0,
-    height_cm: 24.0,
-    depth_cm: 8.0,
-    top_clearance_cm: 0.0,
-    side_clearance_cm: 0.0,
-    rear_clearance_cm: 0.0,
-    image_url: 'https://images.unsplash.com/photo-1611854779393-1b2da9d400fe?w=800&auto=format&fit=crop&q=80',
-    description: 'Our signature cafe bar espresso blend. Formulated to cut through textured oat and whole milk with dense bittersweet chocolate fudge and spiced hazelnut.',
-    slug: 'highland-dark-peak-espresso-blend',
-  },
-  {
-    id: 'prod_baarbara_whiskey',
-    name: 'Baarbara Estate - Whiskey Barrel Aged',
-    brand: 'Hiljhil Roasters',
-    sku: 'HJ-BB-250',
-    category: 'coffee_beans',
-    price: 1250.0,
-    compare_at_price: 1400.0,
-    status: 'active',
-    tax_category: 'standard',
-    badge: 'Exclusive Lot',
-    in_stock: true,
-    rating: 4.95,
-    review_count: 128,
-    roast_level: 'Medium',
-    estate_name: 'Baarbara Estate',
-    elevation_m: 1450,
-    process_method: 'Oak Whiskey Barrel Aged Washed',
-    region: 'Baba Budangiri, Chikmagalur, Karnataka',
-    varietal: 'Arabica S795',
-    resting_period_days: 10,
-    acidity: 'medium',
-    bitterness: 'low',
-    body: 'Layered and Complex',
-    best_enjoyed: 'black',
-    taste_notes: ['Ripe Banana', 'Red Plum', 'Whiskey Oak', 'Cocoa', 'Sweet Cardamom', 'Irish Cream'],
-    recommended_brew_methods: ['aeropress', 'pour_over', 'moka_pot', 'cold_brew'],
-    variants: [
-      { size: '250g', weight_grams: 250, price: 1250.0, compare_at_price: 1400.0, sku: 'HJ-BB-250', available: true },
-      { size: '500g', weight_grams: 500, price: 2350.0, compare_at_price: 2800.0, sku: 'HJ-BB-500', available: true },
-      { size: '1kg', weight_grams: 1000, price: 4400.0, compare_at_price: 5600.0, sku: 'HJ-BB-1KG', available: true },
-    ],
-    width_cm: 10.0,
-    height_cm: 20.0,
-    depth_cm: 6.0,
-    top_clearance_cm: 0.0,
-    side_clearance_cm: 0.0,
-    rear_clearance_cm: 0.0,
-    image_url: 'https://cdn.shopify.com/s/files/1/0738/1409/files/1_6.jpg?v=1787560255',
-    images: [
-      { position: 1, src: 'https://cdn.shopify.com/s/files/1/0738/1409/files/1_6.jpg?v=1787560255' },
-      { position: 2, src: 'https://cdn.shopify.com/s/files/1/0738/1409/files/WEB_-100_4.jpg?v=1787741398' },
-      { position: 3, src: 'https://cdn.shopify.com/s/files/1/0738/1409/files/2_1_7d258e8c-67e8-48b7-9745-98ac3b51d065.jpg?v=1787560255' },
-    ],
-    description: 'This coffee’s journey began at Baarbara Estate in the foothills of Baba Budangiri, the origin of coffee in India. Aged for nearly four months in freshly emptied malt whiskey oak barrels in a controlled microclimate, turned every few days and cupped regularly. Yields wine-like aromas, sweet cardamom, whiskey oak, and a lingering Irish cream finish. 100% non-alcoholic.',
-    slug: 'baarbara-estate-whiskey-barrel-aged',
-    specs_json: JSON.stringify({
-      coordinates: { lat: '13.4062° N', lng: '75.7686° E' },
-      sensory_scales: { acidity: 2.5, sweetness: 4.5, body: 4.0, bitterness: 2.0, roast_level: 3.0 },
-      estate_details: {
-        name: 'Baarbara Estate',
-        location: 'Chikmagalur, Karnataka',
-        heritage: 'Run by the 3rd generation of seasoned Chikmagalur coffee cultivators from the Indavara family (MG Plantations) with 120+ years of coffee heritage.',
-        certifications: ['UTZ Certified', 'Rainforest Alliance', 'Shade Grown Canopy'],
-      },
-      origin_story: 'This coffee’s journey began at Baarbara Estate in the foothills of Baba Budangiri, the origin of coffee in India. It was shaped by a process the estate has spent years refining: aged for nearly four months in freshly emptied malt whiskey oak barrels housed in a covered, temperature-controlled cellar away from sunlight. The barrels were carefully turned every few days, allowing the beans to absorb rich vanilla oak aromas while preserving coffee terroir. Note: 100% Non-alcoholic.',
-      resting_note: 'Recommended resting period: 10 days from roast date for optimal degassing and flavor clarity.',
-      brew_guides: [
-        {
-          method: 'AeroPress',
-          time: '2:30 MINS',
-          dose: '18G',
-          water: '230ML',
-          temp: '92°C',
-          grind: 'Medium-Fine',
-          ratio: '1:12.8',
-          steps: [
-            'Rinse paper filter and preheat AeroPress cylinder with hot water.',
-            'Add 18g medium-fine coffee grounds in standard position.',
-            'Pour 60ml of 92°C water and stir gently for 30s bloom.',
-            'Fill to 230ml, attach plunger, and press gently for 45 seconds.',
-          ],
-        },
-        {
-          method: 'Pour Over',
-          time: '3:15 MINS',
-          dose: '15G',
-          water: '250ML',
-          temp: '93°C',
-          grind: 'Medium',
-          ratio: '1:16.7',
-          steps: [
-            'Rinse paper filter with boiling water to remove paper taste.',
-            'Add 15g medium grounds, leveling the bed.',
-            'Pour 50ml bloom water and pause 45 seconds for degassing.',
-            'Pour remaining 200ml in steady spiral concentric circles, finishing drawdown by 3:15.',
-          ],
-        },
-        {
-          method: 'Moka Pot',
-          time: '2:45 MINS',
-          dose: '18G',
-          water: '120ML',
-          temp: '50°C (Preheated)',
-          grind: 'Fine-Medium',
-          ratio: '1:6.7',
-          steps: [
-            'Fill lower chamber with preheated water up to the safety valve.',
-            'Fill funnel basket with 18g coffee without tamping.',
-            'Place on low-medium flame; remove immediately when golden hazel flow foams.',
-            'Cool base under cold tap water to stop extraction.',
-          ],
-        },
-        {
-          method: 'Cold Brew',
-          time: '16:00 HRS',
-          dose: '50G',
-          water: '450ML',
-          temp: 'Chilled Water',
-          grind: 'Coarse',
-          ratio: '1:9.0',
-          steps: [
-            'Combine 50g coarse grounds with 450ml cold filtered water in an airtight jar.',
-            'Gently stir to ensure even saturation.',
-            'Steep in refrigerator for 16-18 hours.',
-            'Strain through cloth/paper filter and serve over ice with an orange twist.',
-          ],
-        },
-      ],
-    }),
-  },
-  {
-    id: 'prod_attikan_estate',
-    name: 'Attikan Estate - Dark Roast (250g)',
-    brand: 'Hiljhil Roasters',
-    sku: 'HJ-ATK-250',
-    category: 'coffee_beans',
-    price: 550.0,
-    compare_at_price: 600.0,
-    status: 'active',
-    tax_category: 'standard',
-    badge: 'Bestseller',
-    in_stock: true,
-    rating: 4.85,
-    review_count: 310,
-    roast_level: 'Dark',
-    estate_name: 'Attikan Estate, BR Hills',
-    elevation_m: 1650,
-    process_method: 'Washed',
-    region: 'Biligirirangana Hills',
-    varietal: 'S.795 & Kent',
-    taste_notes: ['Smoked Cocoa', 'Fig', 'Brown Sugar'],
-    width_cm: 10.0,
-    height_cm: 20.0,
-    depth_cm: 6.0,
-    top_clearance_cm: 0.0,
-    side_clearance_cm: 0.0,
-    rear_clearance_cm: 0.0,
-    image_url: 'https://images.unsplash.com/photo-1610632380989-680fe40816c6?w=800&auto=format&fit=crop&q=80',
-    description: 'Deep high-elevation shade-grown dark roast from the evergreen BR Hills. Heavy body with molasses sweetness, perfect for South Indian filter or Moka Pot.',
-    slug: 'attikan-estate-dark-roast',
-  },
-  {
-    id: 'prod_silver_oak_blend',
-    name: 'Silver Oak Blend - Medium Roast (250g)',
-    brand: 'Hiljhil Roasters',
-    sku: 'HJ-SOB-250',
-    category: 'coffee_beans',
-    price: 520.0,
-    status: 'active',
-    tax_category: 'standard',
-    badge: 'Classic',
-    in_stock: true,
-    rating: 4.8,
-    review_count: 95,
-    roast_level: 'Medium',
-    estate_name: 'Western Ghats Single Estates',
-    elevation_m: 1400,
-    process_method: 'Washed & Natural Blend',
-    region: 'Chikmagalur',
-    varietal: 'SLN 795 & Arabica',
-    taste_notes: ['Hazelnut', 'Mild Citrus', 'Wild Honey'],
-    width_cm: 10.0,
-    height_cm: 20.0,
-    depth_cm: 6.0,
-    top_clearance_cm: 0.0,
-    side_clearance_cm: 0.0,
-    rear_clearance_cm: 0.0,
-    image_url: 'https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=800&auto=format&fit=crop&q=80',
-    description: 'Our house morning blend pairing Chikmagalur washed arabica with sweet natural lots. Smooth, comforting, and sweet.',
-    slug: 'silver-oak-blend-medium-roast',
-  },
-  {
-    id: 'prod_vienna_roast',
-    name: 'Vienna Roast - Deep & Smoky (250g)',
-    brand: 'Hiljhil Roasters',
-    sku: 'HJ-VR-250',
-    category: 'coffee_beans',
-    price: 530.0,
-    status: 'active',
-    tax_category: 'standard',
-    badge: 'Popular',
-    in_stock: true,
-    rating: 4.7,
-    review_count: 88,
-    roast_level: 'Vienna Dark',
-    estate_name: 'Shevaroys & Nilgiris Blend',
-    elevation_m: 1350,
-    process_method: 'Double Washed',
-    region: 'Nilgiri Hills',
-    varietal: 'Arabica & Selection 9',
-    taste_notes: ['Cocoa Nibs', 'Burnt Caramel', 'Toasted Walnut'],
-    width_cm: 10.0,
-    height_cm: 20.0,
-    depth_cm: 6.0,
-    top_clearance_cm: 0.0,
-    side_clearance_cm: 0.0,
-    rear_clearance_cm: 0.0,
-    image_url: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=800&auto=format&fit=crop&q=80',
-    description: 'An intense, full-bodied dark roast developed for bold morning cups with rich milk sweetness and lingering toasted dark cacao notes.',
-    slug: 'vienna-roast-deep-smoky',
-  },
-  {
-    id: 'prod_cold_brew_blend',
-    name: 'Summer Cold Brew Blend - Coarse (250g)',
-    brand: 'Hiljhil Roasters',
-    sku: 'HJ-CBB-250',
-    category: 'coffee_beans',
-    price: 580.0,
-    status: 'active',
-    tax_category: 'standard',
-    badge: 'Summer Special',
-    in_stock: true,
-    rating: 4.9,
-    review_count: 114,
-    roast_level: 'Medium Dark',
-    estate_name: 'Karnataka High Elevation Lot',
-    elevation_m: 1200,
-    process_method: 'Pulp Natural',
-    region: 'Coorg & Chikmagalur',
-    varietal: 'Specialty Arabica & Robusta',
-    taste_notes: ['Sweet Citrus', 'Milk Chocolate', 'Stone Fruits'],
-    width_cm: 10.0,
-    height_cm: 20.0,
-    depth_cm: 6.0,
-    top_clearance_cm: 0.0,
-    side_clearance_cm: 0.0,
-    rear_clearance_cm: 0.0,
-    image_url: 'https://images.unsplash.com/photo-1517668808822-9ebb02f2a0e6?w=800&auto=format&fit=crop&q=80',
-    description: 'Coarsely ground specialty lot designed for 18-hour cold immersion brewing. Silky, refreshing, naturally sweet, with near-zero bitterness.',
-    slug: 'summer-cold-brew-blend',
-  },
-  {
-    id: 'prod_easy_pour_box',
-    name: 'Easy Pour Drip Bags - 10 Pack',
-    brand: 'Hiljhil Roasters',
-    sku: 'HJ-EPB-10',
-    category: 'coffee_beans',
-    price: 450.0,
-    status: 'active',
-    tax_category: 'standard',
-    badge: 'Easy Brew',
-    in_stock: true,
-    rating: 4.8,
-    review_count: 210,
-    roast_level: 'Medium Dark',
-    estate_name: 'Single Estate Lot',
-    elevation_m: 1400,
-    process_method: 'Washed',
-    region: 'Chikmagalur',
-    varietal: 'SLN 795',
-    taste_notes: ['Caramel', 'Roasted Almond', 'Milk Chocolate'],
-    width_cm: 12.0,
-    height_cm: 15.0,
-    depth_cm: 8.0,
-    top_clearance_cm: 0.0,
-    side_clearance_cm: 0.0,
-    rear_clearance_cm: 0.0,
-    image_url: 'https://images.unsplash.com/photo-1544787219-7f47ccb76574?w=800&auto=format&fit=crop&q=80',
-    description: 'Individually nitrogen-flushed filter drip bags containing fresh roasted specialty grounds. Pour hot water directly anywhere, anytime without equipment.',
-    slug: 'easy-pour-drip-bags-10-pack',
-  },
-  {
-    id: 'prod_breville_barista_touch',
-    name: 'Barista Touch Espresso Machine',
-    brand: 'Breville',
-    sku: 'BES880BSS',
-    category: 'equipment',
-    price: 89900.0,
-    compare_at_price: 95000.0,
-    status: 'active',
-    tax_category: 'standard',
-    badge: 'CounterCheck Verified',
-    in_stock: true,
-    rating: 4.9,
-    review_count: 840,
-    width_cm: 32.2,
-    height_cm: 40.7,
-    depth_cm: 32.2,
-    top_clearance_cm: 12.0,
-    side_clearance_cm: 5.0,
-    rear_clearance_cm: 5.0,
-    image_url: 'https://images.unsplash.com/photo-1570968915860-54d5c301fa9f?w=800&auto=format&fit=crop&q=80',
-    description: 'Automated touchscreen espresso machine with integrated precision conical burr grinder and automated microfoam texturing.',
-    slug: 'breville-barista-touch-espresso-machine',
-  },
-  {
-    id: 'prod_delonghi_dedica',
-    name: 'Dedica Deluxe Slim Espresso Machine',
-    brand: "De'Longhi",
-    sku: 'EC680M',
-    category: 'equipment',
-    price: 29995.0,
-    status: 'active',
-    tax_category: 'standard',
-    badge: 'Compact Fit',
-    in_stock: true,
-    rating: 4.7,
-    review_count: 512,
-    width_cm: 14.9,
-    height_cm: 30.5,
-    depth_cm: 33.0,
-    top_clearance_cm: 5.0,
-    side_clearance_cm: 3.0,
-    rear_clearance_cm: 4.0,
-    image_url: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=800&auto=format&fit=crop&q=80',
-    description: 'Ultra-slim 6-inch wide manual espresso machine engineered for tight kitchen coffee bars and apartment countertops.',
-    slug: 'delonghi-dedica-deluxe-slim',
-  },
-  {
-    id: 'prod_breville_bambino',
-    name: 'Bambino Plus Compact Espresso Machine',
-    brand: 'Breville',
-    sku: 'BES500BSS',
-    category: 'equipment',
-    price: 49995.0,
-    status: 'active',
-    tax_category: 'standard',
-    badge: 'Rapid Heatup',
-    in_stock: true,
-    rating: 4.8,
-    review_count: 420,
-    width_cm: 19.5,
-    height_cm: 31.0,
-    depth_cm: 32.0,
-    top_clearance_cm: 5.0,
-    side_clearance_cm: 3.0,
-    rear_clearance_cm: 4.0,
-    image_url: 'https://images.unsplash.com/photo-1509785307050-d4066910ec1e?w=800&auto=format&fit=crop&q=80',
-    description: 'Compact espresso machine delivering cafe-quality third wave specialty coffee with 3-second ThermoJet heatup system.',
-    slug: 'breville-bambino-plus-compact',
-  },
-  {
-    id: 'prod_fellow_ode_gen2',
-    name: 'Ode Gen 2 Precision Brew Grinder',
-    brand: 'Fellow',
-    sku: 'FEL-ODE-G2',
-    category: 'equipment',
-    price: 28500.0,
-    status: 'active',
-    tax_category: 'standard',
-    badge: 'Barista Choice',
-    in_stock: true,
-    rating: 4.9,
-    review_count: 365,
-    width_cm: 12.0,
-    height_cm: 24.1,
-    depth_cm: 23.9,
-    top_clearance_cm: 4.0,
-    side_clearance_cm: 2.0,
-    rear_clearance_cm: 2.0,
-    image_url: 'https://images.unsplash.com/photo-1589396575653-c09c794ff6a6?w=800&auto=format&fit=crop&q=80',
-    description: 'Low-profile single dose grinder with 64mm professional flat burrs designed specifically for pour-overs, French press, and cold brews.',
-    slug: 'fellow-ode-gen-2-grinder',
-  },
-];
-
-export function transformCatalogProduct(prod: CatalogProduct): ProductItem {
-  const isEquipment = prod.category === 'equipment';
-  const specs: Record<string, string> = {};
-
-  if (isEquipment) {
-    if (prod.width_cm && prod.height_cm && prod.depth_cm) {
-      specs['Dimensions'] = `${prod.width_cm} × ${prod.height_cm} × ${prod.depth_cm} cm`;
-    }
-    if (prod.top_clearance_cm > 0) {
-      specs['Clearance'] = `Requires ${prod.height_cm + prod.top_clearance_cm} cm vertical headroom`;
-    }
-    if (prod.brand) specs['Brand'] = prod.brand;
-  } else {
-    if (prod.estate_name) specs['Estate'] = prod.estate_name;
-    if (prod.elevation_m) specs['Altitude'] = `${prod.elevation_m} MASL`;
-    if (prod.roast_level) specs['Roast Level'] = prod.roast_level;
-    if (prod.process_method) specs['Process'] = prod.process_method;
-    if (prod.region) specs['Region'] = prod.region;
-    if (prod.varietal) specs['Varietal'] = prod.varietal;
-  }
-
-  let parsedSpecsData: CoffeeSpecsData | undefined = undefined;
-  if (prod.specs_json) {
+export function transformCatalogProduct(p: CatalogProduct): ProductItem {
+  let parsedSpecsData: CoffeeSpecsData | undefined;
+  if (p.specs_json) {
     try {
-      parsedSpecsData = JSON.parse(prod.specs_json);
-    } catch {
-      parsedSpecsData = undefined;
-    }
+      parsedSpecsData = JSON.parse(p.specs_json);
+    } catch {}
   }
 
   return {
-    id: prod.id,
-    name: prod.name,
-    category: isEquipment ? 'equipment' : 'coffee',
-    priceCents: Math.round((prod.price || 0) * 100),
-    compareAtCents: prod.compare_at_price ? Math.round(prod.compare_at_price * 100) : undefined,
-    badge: prod.badge || undefined,
-    heightCm: prod.height_cm || undefined,
-    rating: prod.rating || 5.0,
-    reviewCount: prod.review_count || 0,
-    tasteNotes: Array.isArray(prod.taste_notes) ? prod.taste_notes : [],
-    specs,
-    description: prod.description || '',
-    image: prod.image_url || 'https://images.unsplash.com/photo-1587734195503-904fca47e0e9?w=800',
-    images: prod.images || undefined,
-    inStock: prod.in_stock,
-    roastLevel: prod.roast_level || undefined,
-    estateName: prod.estate_name || undefined,
-    processMethod: prod.process_method || undefined,
-    slug: prod.slug,
-    elevationM: prod.elevation_m || undefined,
-    varietal: prod.varietal || undefined,
-    region: prod.region || undefined,
-    restingPeriodDays: prod.resting_period_days || undefined,
-    acidity: prod.acidity || undefined,
-    bitterness: prod.bitterness || undefined,
-    body: prod.body || undefined,
-    bestEnjoyed: prod.best_enjoyed || undefined,
-    variants: prod.variants || undefined,
+    id: p.id,
+    name: p.name,
+    category: p.category === 'coffee_beans' ? 'coffee' : 'equipment',
+    priceCents: Math.round(p.price * 100),
+    compareAtCents: p.compare_at_price ? Math.round(p.compare_at_price * 100) : undefined,
+    badge: p.badge || undefined,
+    heightCm: p.height_cm || 0,
+    rating: p.rating || 5,
+    reviewCount: p.review_count || 0,
+    tasteNotes: p.taste_notes || [],
+    specs: {
+      Dimensions: `${p.width_cm || 0}W × ${p.height_cm || 0}H × ${p.depth_cm || 0}D cm`,
+      Brand: p.brand,
+      SKU: p.sku,
+    },
+    description: p.description || '',
+    image: p.image_url || '',
+    images: p.images || (p.image_url ? [{ position: 1, src: p.image_url }] : []),
+    inStock: p.in_stock,
+    roastLevel: p.roast_level || undefined,
+    estateName: p.estate_name || undefined,
+    processMethod: p.process_method || undefined,
+    slug: p.slug || undefined,
+    elevationM: p.elevation_m || undefined,
+    varietal: p.varietal || undefined,
+    region: p.region || undefined,
+    restingPeriodDays: p.resting_period_days || undefined,
+    acidity: p.acidity || undefined,
+    bitterness: p.bitterness || undefined,
+    body: p.body || undefined,
+    bestEnjoyed: p.best_enjoyed || undefined,
+    variants: p.variants || [],
     specsData: parsedSpecsData,
   };
 }
@@ -628,41 +177,20 @@ export async function fetchProducts(filters: {
 
       const res = await fetch(`${CATALOG_API_URL}/products?${params.toString()}`, {
         cache: 'no-store',
-        signal: AbortSignal.timeout(3000),
+        signal: AbortSignal.timeout(3500),
       });
 
       if (res.ok) {
         const data = await res.json();
-        const items: CatalogProduct[] = data.items || [];
+        const items: CatalogProduct[] = data.items || (Array.isArray(data) ? data : []);
         return items.map(transformCatalogProduct);
       }
     } catch {
-      // Fallback seamlessly to offline static products
+      // Remote service temporarily unavailable
     }
   }
 
-  // Resilient offline fallback
-  let items = [...FALLBACK_CATALOG_PRODUCTS];
-  if (filters.category && filters.category !== 'all') {
-    items = items.filter((p) => p.category === filters.category);
-  }
-  if (filters.brand) {
-    items = items.filter((p) => p.brand?.toLowerCase() === filters.brand!.toLowerCase());
-  }
-  if (filters.q) {
-    const qLower = filters.q.toLowerCase();
-    items = items.filter(
-      (p) =>
-        p.name.toLowerCase().includes(qLower) ||
-        p.description?.toLowerCase().includes(qLower) ||
-        (p.taste_notes && p.taste_notes.some((t) => t.toLowerCase().includes(qLower)))
-    );
-  }
-  if (filters.limit) {
-    items = items.slice(0, filters.limit);
-  }
-
-  return items.map(transformCatalogProduct);
+  return [];
 }
 
 export async function fetchProductByIdOrSlug(idOrSlug: string): Promise<ProductItem | null> {
@@ -670,7 +198,7 @@ export async function fetchProductByIdOrSlug(idOrSlug: string): Promise<ProductI
     try {
       const res = await fetch(`${CATALOG_API_URL}/products/${idOrSlug}`, {
         cache: 'no-store',
-        signal: AbortSignal.timeout(3000),
+        signal: AbortSignal.timeout(3500),
       });
 
       if (res.status === 404) {
@@ -682,15 +210,11 @@ export async function fetchProductByIdOrSlug(idOrSlug: string): Promise<ProductI
         return transformCatalogProduct(prod);
       }
     } catch {
-      // Fallback seamlessly
+      // Remote service temporarily unavailable
     }
   }
 
-  const found = FALLBACK_CATALOG_PRODUCTS.find(
-    (p) => p.id === idOrSlug || p.slug === idOrSlug
-  );
-
-  return found ? transformCatalogProduct(found) : null;
+  return null;
 }
 
 export async function fetchEquipment(maxHeightCm?: number): Promise<ProductItem[]> {
@@ -702,7 +226,7 @@ export async function fetchEquipment(maxHeightCm?: number): Promise<ProductItem[
 
       const res = await fetch(url, {
         cache: 'no-store',
-        signal: AbortSignal.timeout(3000),
+        signal: AbortSignal.timeout(3500),
       });
 
       if (res.ok) {
@@ -711,14 +235,9 @@ export async function fetchEquipment(maxHeightCm?: number): Promise<ProductItem[
         return items.map(transformCatalogProduct);
       }
     } catch {
-      // Fallback seamlessly
+      // Remote service temporarily unavailable
     }
   }
 
-  let equipment = FALLBACK_CATALOG_PRODUCTS.filter((p) => p.category === 'equipment');
-  if (maxHeightCm !== undefined) {
-    equipment = equipment.filter((p) => (p.height_cm || 0) <= maxHeightCm);
-  }
-  return equipment.map(transformCatalogProduct);
+  return [];
 }
-
