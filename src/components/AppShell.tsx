@@ -2,63 +2,30 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { PromoBar, NavigationHeader, Footer, NavLinkItem } from '@dipesh.singh/commerce-ui';
+import { PromoBar, NavigationHeader, Footer } from '@dipesh.singh/commerce-ui';
 import { FederatedSearchModal } from './FederatedSearchModal';
 import { ProtonThemeProvider } from '@dipesh.singh/proton/react';
 import { CheckCircle2, X, ShoppingBag } from 'lucide-react';
-import { fetchActiveTheme, DEFAULT_STORE_THEME, ThemeConfig } from '../lib/contentApi';
+import {
+  GlobalShellConfig,
+  DEFAULT_GLOBAL_SHELL,
+  fetchGlobalShell,
+  transformHeaderToNavLinks,
+  transformFooterToSections,
+  transformFooterSocialLinks,
+  normalizeCmsUrl,
+} from '../lib/contentApi';
 
-const STORE_NAV_LINKS: NavLinkItem[] = [
-  {
-    id: 'coffees',
-    label: 'Coffees',
-    href: '/coffees',
-    subItems: [
-      { id: 'roasted', label: 'Roasted & Ground Beans', href: '/coffees', description: 'Single-origin estates & signature blends', badge: 'Popular' },
-      { id: 'easy-pour', label: 'Easy Pour & Drip Bags', href: '/coffees', description: 'Fresh pour over coffee in 3 easy steps' },
-      { id: 'concentrates', label: 'Specialty Cold Brew Drops', href: '/coffees', description: 'Stir & sip iced coffee concentrate', badge: 'NEW' },
-      { id: 'bundles', label: 'Tasting & Explorer Bundles', href: '/offers', description: 'Curated roasts for every palate' },
-    ],
-  },
-  {
-    id: 'equipment',
-    label: 'Equipment',
-    href: '/equipment',
-    subItems: [
-      { id: 'espresso', label: 'Espresso Machines', href: '/equipment', description: 'Breville, Gaggia, and home barista machines' },
-      { id: 'grinders', label: 'Precision Burr Grinders', href: '/equipment', description: 'Electric and manual burr grinders' },
-      { id: 'pour-over', label: 'Pour Over & Drippers', href: '/equipment', description: 'V60, Chemex, and Aeropress gear' },
-      { id: 'drinkware', label: 'Barista Drinkware', href: '/equipment' },
-    ],
-  },
-  {
-    id: 'subscriptions',
-    label: 'Subscriptions',
-    href: '/subscriptions',
-  },
-  {
-    id: 'cafes',
-    label: 'Our Cafes',
-    href: '/cafes',
-  },
-  {
-    id: 'offers',
-    label: 'Offers',
-    href: '/offers',
-    isHighlight: true,
-    highlightBadge: 'HOT',
-  },
-];
-
-interface StoreNavigationProps {
+interface AppShellProps {
   children: React.ReactNode;
+  initialShell?: GlobalShellConfig;
 }
 
-export const StoreNavigation: React.FC<StoreNavigationProps> = ({ children }) => {
+export const AppShell: React.FC<AppShellProps> = ({ children, initialShell }) => {
   const router = useRouter();
   const pathname = usePathname();
-  const [theme, setTheme] = useState<ThemeConfig>(DEFAULT_STORE_THEME);
-  const [cartCount, setCartCount] = useState<number>(2);
+  const [shell, setShell] = useState<GlobalShellConfig>(initialShell || DEFAULT_GLOBAL_SHELL);
+  const [cartCount, setCartCount] = useState<number>(0);
   const [toastMessage, setToastMessage] = useState<{ text: string; actionText?: string; actionRoute?: string } | null>(null);
   const [isSearchOpen, setIsSearchOpen] = useState<boolean>(false);
 
@@ -74,18 +41,24 @@ export const StoreNavigation: React.FC<StoreNavigationProps> = ({ children }) =>
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  // Sync theme from Cloud Run content-service and listen for live CMS preview messages
+  // Fetch active shell and listen for live CMS preview messages
   useEffect(() => {
     let isMounted = true;
-    fetchActiveTheme().then((activeTheme) => {
-      if (isMounted && activeTheme) {
-        setTheme(activeTheme);
+
+    fetchGlobalShell().then((activeShell) => {
+      if (isMounted && activeShell) {
+        setShell(activeShell);
       }
     });
 
     const handleMessage = (event: MessageEvent) => {
-      if (event.data?.type === 'PIM_THEME_UPDATED' && event.data.theme) {
-        setTheme(event.data.theme);
+      if (event.data?.type === 'PIM_SHELL_UPDATED' && event.data.shell) {
+        setShell(event.data.shell);
+      } else if (event.data?.type === 'PIM_THEME_UPDATED' && event.data.theme) {
+        setShell((prev) => ({
+          ...prev,
+          theme: event.data.theme,
+        }));
       }
     };
 
@@ -116,12 +89,17 @@ export const StoreNavigation: React.FC<StoreNavigationProps> = ({ children }) =>
     }, 4500);
   };
 
+  const theme = shell.theme || DEFAULT_GLOBAL_SHELL.theme!;
   const fontClass =
     theme.font_family === 'serif'
       ? 'font-serif'
       : theme.font_family === 'mono'
       ? 'font-mono'
       : 'font-sans';
+
+  const promo = shell.promo_bar;
+  const header = shell.header;
+  const footer = shell.footer;
 
   return (
     <ProtonThemeProvider>
@@ -132,37 +110,48 @@ export const StoreNavigation: React.FC<StoreNavigationProps> = ({ children }) =>
           color: theme.text_color || '#0f172a',
         }}
       >
-        {/* Global Announcement PromoBar */}
-        <PromoBar
-          message={
-            theme.badge_text
-              ? `${theme.badge_text} · Get 10% off on your first order with code -`
-              : 'Get 10% off on your first coffee purchase, use code -'
-          }
-          promoCode="COFFEE10"
-          tag={theme.badge_text || 'WELCOME'}
-          variant="coffee"
-          onCopyCode={(code) => showToast(`Copied promo coupon code: ${code}`)}
-        />
+        {/* Dynamic Global Announcement PromoBar from content-service */}
+        {promo && promo.enabled && (
+          <PromoBar
+            message={promo.text}
+            promoCode={promo.badge || undefined}
+            variant={
+              promo.theme === 'emerald'
+                ? 'emerald'
+                : promo.theme === 'amber'
+                ? 'amber'
+                : promo.theme === 'dark' || promo.theme === 'espresso'
+                ? 'dark'
+                : 'coffee'
+            }
+          />
+        )}
 
-        {/* Global Retail Navigation Header */}
-        <NavigationHeader
-          logo={{
-            imageUrl: '/logo.jpg',
-            text: 'HILL JHIL',
-            tagline: 'Himalayan Alpine Sourced · Pure Mountain Roast',
-            href: '/',
-          }}
-          links={STORE_NAV_LINKS}
-          ctaPill={{
-            label: 'Subscribe & Save',
-            onClick: () => router.push('/subscriptions'),
-          }}
-          cartCount={cartCount}
-          onSearchClick={() => setIsSearchOpen(true)}
-          onAccountClick={() => showToast('Demo Account Profile: Highland District Club Member')}
-          onCartClick={() => router.push('/cart')}
-        />
+        {/* Dynamic Retail Navigation Header from content-service */}
+        {header && (
+          <NavigationHeader
+            logo={{
+              imageUrl: header.logo_url || '/logo.jpg',
+              text: header.brand_name || 'HILL JHIL',
+              tagline: header.brand_tagline || undefined,
+              href: '/',
+            }}
+            links={transformHeaderToNavLinks(header)}
+            ctaPill={
+              promo?.cta_text && promo?.cta_url
+                ? {
+                    label: promo.cta_text,
+                    onClick: () => router.push(normalizeCmsUrl(promo.cta_url)),
+                  }
+                : undefined
+            }
+            cartCount={cartCount}
+            onSearchClick={() => setIsSearchOpen(true)}
+            onAccountClick={() => showToast('Demo Account Profile: Highland District Club Member')}
+            onCartClick={() => router.push('/cart')}
+            sticky={header.sticky !== false}
+          />
+        )}
 
         {/* Federated Search Modal (searchUi MFE) */}
         <FederatedSearchModal
@@ -201,15 +190,22 @@ export const StoreNavigation: React.FC<StoreNavigationProps> = ({ children }) =>
           </div>
         )}
 
-        {/* Storefront Footer */}
-        <Footer
-          brandName="HILL JHIL ROASTERS"
-          onNewsletterSubmit={async (email) => {
-            await new Promise((r) => setTimeout(r, 600));
-            showToast(`Thank you for subscribing with ${email}!`);
-          }}
-        />
+        {/* Dynamic Storefront Footer from content-service */}
+        {footer && (
+          <Footer
+            brandName={footer.brand_name || 'HILL JHIL ROASTERS'}
+            sections={transformFooterToSections(footer)}
+            socialLinks={transformFooterSocialLinks(footer)}
+            onNewsletterSubmit={async (email) => {
+              await new Promise((r) => setTimeout(r, 600));
+              showToast(`Thank you for subscribing with ${email}!`);
+            }}
+          />
+        )}
       </div>
     </ProtonThemeProvider>
   );
 };
+
+// Re-export for backward compatibility
+export const StoreNavigation = AppShell;
