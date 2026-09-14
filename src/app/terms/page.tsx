@@ -1,8 +1,8 @@
 'use client';
 
 import React from 'react';
-import { LegalPage } from '../../views/LegalPage';
+import { LegalContent } from '@/components/LegalContent';
 
 export default function Page() {
-  return <LegalPage type="terms" />;
+  return <LegalContent type="terms" />;
 }

@@ -1,11 +1,11 @@
 import React from 'react';
 import { Shield, FileText } from 'lucide-react';
 
-interface LegalPageProps {
+interface LegalContentProps {
   type: 'privacy' | 'terms';
 }
 
-export const LegalPage: React.FC<LegalPageProps> = ({ type }) => {
+export const LegalContent: React.FC<LegalContentProps> = ({ type }) => {
   const isPrivacy = type === 'privacy';
 
   return (
@@ -92,3 +92,4 @@ export const LegalPage: React.FC<LegalPageProps> = ({ type }) => {
   );
 };
 
+export default LegalContent;
