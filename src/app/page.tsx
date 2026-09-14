@@ -1,21 +1,34 @@
-import { fetchProducts } from '@/lib/catalogApi';
-import { SliderProduct } from '@dipesh.singh/commerce-ui';
-import HomeClient from './HomeClient';
+import React from 'react';
+import type { Metadata } from 'next';
+import { FederatedServerHomepage } from '@/components/FederatedServerHomepage';
 
 export const dynamic = 'force-dynamic';
 
-export default async function HomePage() {
-  const allProducts = await fetchProducts({ limit: 50 });
-  const coffees = allProducts.filter((p) => p.category !== 'equipment');
-  const sliderItems: SliderProduct[] = coffees.map((p) => ({
-    id: p.id,
-    title: p.name.toUpperCase(),
-    subtitle: p.tasteNotes && p.tasteNotes.length > 0 ? p.tasteNotes.join(', ') : p.description,
-    price: `₹ ${(p.priceCents / 100).toLocaleString('en-IN')}`,
-    imageUrl: p.image,
-    badge: p.badge,
-    productUrl: `/product/${p.id}`,
-  }));
+export const metadata: Metadata = {
+  title: 'Hiljhil Cafe | Specialty Coffees & Roastery',
+  description:
+    'Artisanal batch-roasted single-origin coffees, handcrafted pastries, and space-verified home espresso bars. Visit our cafe bar or shop whole beans & gear online.',
+};
 
-  return <HomeClient initialBestsellers={sliderItems} />;
+export default function HomePage() {
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'Organization',
+            name: 'Hiljhil Roasters & Cafe',
+            url: 'https://hiljhil.com',
+            logo: 'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=300',
+            description:
+              'Artisanal batch-roasted specialty coffees, single-estate roasts, and precision barista equipment.',
+          }),
+        }}
+      />
+      <FederatedServerHomepage />
+    </>
+  );
 }
+

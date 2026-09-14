@@ -2,7 +2,7 @@ import React from 'react';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { fetchProducts, fetchProductByIdOrSlug } from '@/lib/catalogApi';
-import { FederatedProductPage } from '@/components/FederatedProductPage';
+import { FederatedServerProductPage } from '@/components/FederatedServerProductPage';
 
 interface PageProps {
   params: { id: string };
@@ -136,7 +136,7 @@ export default async function ProductPage({ params }: PageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
-      <FederatedProductPage productId={product.id} />
+      <FederatedServerProductPage productId={product.id} initialProduct={product} />
     </>
   );
 }

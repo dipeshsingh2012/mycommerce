@@ -76,10 +76,23 @@ export const StoreNavigation: React.FC<StoreNavigationProps> = ({ children }) =>
       }
     };
 
+    const handleCartAdd = (event: Event) => {
+      const customEvent = event as CustomEvent;
+      const product = customEvent.detail?.product;
+      setCartCount((c) => c + 1);
+      if (product?.name) {
+        showToast(`Added ${product.name} to your cart!`, 'View Cart', '/cart');
+      } else {
+        showToast('Item added to your cart!', 'View Cart', '/cart');
+      }
+    };
+
     window.addEventListener('message', handleMessage);
+    window.addEventListener('commerce:cart:add', handleCartAdd);
     return () => {
       isMounted = false;
       window.removeEventListener('message', handleMessage);
+      window.removeEventListener('commerce:cart:add', handleCartAdd);
     };
   }, []);
 
