@@ -195,6 +195,18 @@ export async function renderMfeServerComponent({
       return null;
     }
 
+    // 1. Direct standalone render function exported by self-contained MFE SSR bundle
+    if (typeof mod.render === 'function') {
+      try {
+        const html = await mod.render(props);
+        if (typeof html === 'string') {
+          return { html };
+        }
+      } catch (renderErr) {
+        console.warn(`[mfeServerLoader] mod.render failed for "${moduleName}":`, renderErr);
+      }
+    }
+
     let Component: React.ComponentType<any> | null = null;
     if (componentExportName && typeof mod[componentExportName] === 'function') {
       Component = mod[componentExportName];

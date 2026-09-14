@@ -2,8 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { PromoBar, NavigationHeader, NavLinkItem } from '@dipesh.singh/commerce-ui';
-import { Footer } from './Footer';
+import { PromoBar, NavigationHeader, Footer, NavLinkItem } from '@dipesh.singh/commerce-ui';
 import { FederatedSearchModal } from './FederatedSearchModal';
 import { ProtonThemeProvider } from '@dipesh.singh/proton/react';
 import { CheckCircle2, X, ShoppingBag } from 'lucide-react';
