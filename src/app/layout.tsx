@@ -18,7 +18,7 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: {
       title: `${brandName} | ${tagline}`,
       description,
-      url: 'https://hiljhil.com',
+      url: 'https://hilljhil.cafe',
       siteName: brandName,
       images: [
         {

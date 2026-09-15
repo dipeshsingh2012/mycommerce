@@ -2,7 +2,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { PromoBar, NavigationHeader, Footer } from '@dipesh.singh/commerce-ui';
+import { Footer } from '@dipesh.singh/commerce-ui';
+import { StoreHeader } from './StoreHeader';
+import { StorePromoBar } from './StorePromoBar';
 import { FederatedSearchModal } from './FederatedSearchModal';
 import { ProtonThemeProvider } from '@dipesh.singh/proton/react';
 import { CheckCircle2, X, ShoppingBag } from 'lucide-react';
@@ -112,28 +114,25 @@ export const AppShell: React.FC<AppShellProps> = ({ children, initialShell }) =>
       >
         {/* Dynamic Global Announcement PromoBar from content-service */}
         {promo && promo.enabled && (
-          <PromoBar
+          <StorePromoBar
             message={promo.text}
+            badge={promo.badge || undefined}
             promoCode={promo.badge || undefined}
-            variant={
-              promo.theme === 'emerald'
-                ? 'emerald'
-                : promo.theme === 'amber'
-                ? 'amber'
-                : promo.theme === 'dark' || promo.theme === 'espresso'
-                ? 'dark'
-                : 'coffee'
-            }
+            ctaText={promo.cta_text || undefined}
+            ctaUrl={promo.cta_url ? normalizeCmsUrl(promo.cta_url) : undefined}
+            dismissible={promo.dismissible !== false}
+            theme={theme}
           />
         )}
 
-        {/* Dynamic Retail Navigation Header from content-service */}
+        {/* Dynamic Retail Navigation Header with Next.js Client Routing & Active States */}
         {header && (
-          <NavigationHeader
+          <StoreHeader
             logo={{
               imageUrl: header.logo_url || '/logo.jpg',
               text: header.brand_name || 'HILL JHIL',
-              tagline: header.brand_tagline || undefined,
+              tagline: header.brand_tagline || 'Specialty Sourced & Micro-Lot Roasted',
+              badge: header.brand_badge || 'FLAGSHIP ROASTERY',
               href: '/',
             }}
             links={transformHeaderToNavLinks(header)}
@@ -141,6 +140,7 @@ export const AppShell: React.FC<AppShellProps> = ({ children, initialShell }) =>
               promo?.cta_text && promo?.cta_url
                 ? {
                     label: promo.cta_text,
+                    href: normalizeCmsUrl(promo.cta_url),
                     onClick: () => router.push(normalizeCmsUrl(promo.cta_url)),
                   }
                 : undefined
@@ -150,6 +150,7 @@ export const AppShell: React.FC<AppShellProps> = ({ children, initialShell }) =>
             onAccountClick={() => showToast('Demo Account Profile: Highland District Club Member')}
             onCartClick={() => router.push('/cart')}
             sticky={header.sticky !== false}
+            theme={theme}
           />
         )}
 
