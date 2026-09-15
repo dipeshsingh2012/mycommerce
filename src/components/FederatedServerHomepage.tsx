@@ -17,9 +17,9 @@ const SSR_MFE_URL =
 
 const CSS_MFE_URL =
   process.env.MFE_HOMEPAGE_CSS_URL ||
-  'https://storage.googleapis.com/mycommerce/mfes/homepage-ui/style-D-OXGWNf.css';
+  'https://storage.googleapis.com/mycommerce/mfes/homepage-ui/style-oGoJCEO1.css';
 
-export function FederatedServerHomepage({
+export async function FederatedServerHomepage({
   initialContent,
 }: FederatedServerHomepageProps = {}) {
   const localFallbackPath = path.resolve(

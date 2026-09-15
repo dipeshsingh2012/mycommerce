@@ -19,9 +19,9 @@ const SSR_MFE_URL =
 
 const CSS_MFE_URL =
   process.env.MFE_DISCOVERY_CSS_URL ||
-  'https://storage.googleapis.com/mycommerce/mfes/discovery-ui/style-Djdvs7_p.css';
+  'https://storage.googleapis.com/mycommerce/mfes/discovery-ui/style-BbNxv_ws.css';
 
-export function FederatedServerDiscovery({
+export async function FederatedServerDiscovery({
   initialCategory = 'all',
   initialMaxHeight = null,
 }: FederatedServerDiscoveryProps = {}) {

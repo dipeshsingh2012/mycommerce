@@ -53,7 +53,7 @@ function toMfeProductDetail(product: any): any {
   };
 }
 
-export function FederatedServerProductPage({
+export async function FederatedServerProductPage({
   productId,
   initialProduct,
 }: FederatedServerProductPageProps) {

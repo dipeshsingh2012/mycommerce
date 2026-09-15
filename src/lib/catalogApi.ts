@@ -197,6 +197,162 @@ export async function fetchProducts(filters: {
   return [];
 }
 
+export const FALLBACK_CATALOG_PRODUCTS: CatalogProduct[] = [
+  {
+    id: 'prod_breville_barista_touch',
+    name: 'Barista Touch Espresso Machine',
+    slug: 'prod_breville_barista_touch',
+    brand: 'Breville',
+    sku: 'BES880BSS',
+    category: 'espresso_machine',
+    price: 999.95,
+    status: 'active',
+    in_stock: true,
+    badge: 'BESTSELLER',
+    rating: 4.9,
+    review_count: 142,
+    tax_category: 'standard',
+    width_cm: 32.2,
+    height_cm: 40.7,
+    depth_cm: 32.2,
+    top_clearance_cm: 12.0,
+    side_clearance_cm: 5.0,
+    rear_clearance_cm: 5.0,
+    image_url: 'https://images.unsplash.com/photo-1570968915860-54d5c301fa9f?w=600&auto=format&fit=crop&q=80',
+    description: 'Touchscreen espresso machine with integrated precision conical burr grinder and automated microfoam texturing.',
+    taste_notes: ['Espresso', 'Americano', 'Latte', 'Flat White', 'Cappuccino'],
+    specs_json: JSON.stringify({
+      collar_diameter: '54mm',
+      portafilter_type: '54mm Stainless Steel',
+      boiler: 'ThermoJet 3-second heat up',
+      water_tank_l: 2.0,
+      bean_hopper_g: 250,
+    }),
+  },
+  {
+    id: 'prod_fellow_ode_gen2',
+    name: 'Ode Gen 2 Precision Brew Grinder',
+    slug: 'prod_fellow_ode_gen2',
+    brand: 'Fellow',
+    sku: 'FEL-ODE-G2',
+    category: 'grinder',
+    price: 345.00,
+    status: 'active',
+    in_stock: true,
+    badge: 'POPULAR',
+    rating: 4.8,
+    review_count: 89,
+    tax_category: 'standard',
+    width_cm: 12.0,
+    height_cm: 24.1,
+    depth_cm: 23.9,
+    top_clearance_cm: 4.0,
+    side_clearance_cm: 2.0,
+    rear_clearance_cm: 2.0,
+    image_url: 'https://images.unsplash.com/photo-1589396575653-c09c794ff6a6?w=600&auto=format&fit=crop&q=80',
+    description: 'Low-profile single-dose electric brew grinder with 64mm professional-grade flat burrs engineered for pour-over and cold brew precision.',
+  },
+  {
+    id: 'prod_delonghi_dedica',
+    name: 'Dedica Deluxe Slim Espresso Machine',
+    slug: 'prod_delonghi_dedica',
+    brand: "De'Longhi",
+    sku: 'EC680M',
+    category: 'espresso_machine',
+    price: 299.95,
+    status: 'active',
+    in_stock: true,
+    rating: 4.6,
+    review_count: 76,
+    tax_category: 'standard',
+    width_cm: 14.9,
+    height_cm: 30.5,
+    depth_cm: 33.0,
+    top_clearance_cm: 5.0,
+    side_clearance_cm: 3.0,
+    rear_clearance_cm: 4.0,
+    image_url: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=600&auto=format&fit=crop&q=80',
+    description: 'Ultra-slim 6-inch wide manual espresso machine engineered for tight kitchen coffee counters.',
+  },
+  {
+    id: 'prod_hiljhil_guji',
+    name: 'Ethiopian Guji Single Origin (250g)',
+    slug: 'prod_hiljhil_guji',
+    brand: 'Hiljhil Roasters',
+    sku: 'HJ-GUJI-250',
+    category: 'coffee_beans',
+    price: 22.00,
+    status: 'active',
+    in_stock: true,
+    badge: 'NANO LOT',
+    rating: 5.0,
+    review_count: 34,
+    tax_category: 'coffee_beans',
+    width_cm: 10.0,
+    height_cm: 20.0,
+    depth_cm: 6.0,
+    top_clearance_cm: 0.0,
+    side_clearance_cm: 0.0,
+    rear_clearance_cm: 0.0,
+    roast_level: 'light',
+    process_method: 'natural',
+    estate_name: 'Guji Highlands',
+    region: 'Oromia, Ethiopia',
+    elevation_m: 2100,
+    varietal: 'Heirloom',
+    image_url: 'https://images.unsplash.com/photo-1587734195503-904fca47e0e9?w=600&auto=format&fit=crop&q=80',
+    description: 'Heirloom natural process. Crisp floral aromas with sweet nectarine, wild lavender, and honey finish.',
+    taste_notes: ['Wild Lavender', 'Peach', 'Jasmine', 'Raw Honey'],
+  },
+  {
+    id: 'prod_hiljhil_espresso_blend',
+    name: 'Highland Dark Peak Espresso Blend (500g)',
+    slug: 'prod_hiljhil_espresso_blend',
+    brand: 'Hiljhil Roasters',
+    sku: 'HJ-DPE-500',
+    category: 'coffee_beans',
+    price: 28.50,
+    status: 'active',
+    in_stock: true,
+    rating: 4.9,
+    review_count: 51,
+    tax_category: 'coffee_beans',
+    width_cm: 12.0,
+    height_cm: 24.0,
+    depth_cm: 8.0,
+    top_clearance_cm: 0.0,
+    side_clearance_cm: 0.0,
+    rear_clearance_cm: 0.0,
+    roast_level: 'medium_dark',
+    image_url: 'https://images.unsplash.com/photo-1611854779393-1b2da9d400fe?w=600&auto=format&fit=crop&q=80',
+    description: 'Signature house espresso blend of Colombia & Sumatra. Dark chocolate, candied walnut, and velvety crema.',
+    taste_notes: ['Dark Chocolate', 'Candied Walnut', 'Brown Sugar', 'Velvet Crema'],
+  },
+  {
+    id: 'baarbara-whiskey',
+    name: 'BAARBARA ESTATE - WHISKEY BARREL AGED',
+    slug: 'baarbara-whiskey',
+    brand: 'Hiljhil Roasters',
+    sku: 'HJ-BAR-150',
+    category: 'coffee_beans',
+    price: 15.00,
+    status: 'active',
+    in_stock: true,
+    rating: 5.0,
+    review_count: 22,
+    tax_category: 'coffee_beans',
+    width_cm: 10.0,
+    height_cm: 20.0,
+    depth_cm: 6.0,
+    top_clearance_cm: 0.0,
+    side_clearance_cm: 0.0,
+    rear_clearance_cm: 0.0,
+    image_url: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=600&h=600&fit=crop&q=80',
+    description: 'Ripe banana, Red Plum, Whiskey Oak, and Brown Sugar notes.',
+    taste_notes: ['Ripe Banana', 'Red Plum', 'Whiskey Oak', 'Brown Sugar'],
+  },
+];
+
 export async function fetchProductByIdOrSlug(idOrSlug: string): Promise<ProductItem | null> {
   if (CATALOG_API_URL) {
     try {
@@ -206,7 +362,11 @@ export async function fetchProductByIdOrSlug(idOrSlug: string): Promise<ProductI
       });
 
       if (res.status === 404) {
-        return null;
+        // Check fallback before bailing out
+        const fallback = FALLBACK_CATALOG_PRODUCTS.find(
+          (p) => p.id === idOrSlug || p.slug === idOrSlug
+        );
+        return fallback ? transformCatalogProduct(fallback) : null;
       }
 
       if (res.ok) {
@@ -214,8 +374,16 @@ export async function fetchProductByIdOrSlug(idOrSlug: string): Promise<ProductI
         return transformCatalogProduct(prod);
       }
     } catch {
-      // Remote service temporarily unavailable
+      // Remote service temporarily unavailable, proceed to fallback
     }
+  }
+
+  // Fallback for offline / local development
+  const fallback = FALLBACK_CATALOG_PRODUCTS.find(
+    (p) => p.id === idOrSlug || p.slug === idOrSlug
+  );
+  if (fallback) {
+    return transformCatalogProduct(fallback);
   }
 
   return null;

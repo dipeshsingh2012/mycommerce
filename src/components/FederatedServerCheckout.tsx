@@ -18,9 +18,9 @@ const SSR_MFE_URL =
 
 const CSS_MFE_URL =
   process.env.MFE_CHECKOUT_CSS_URL ||
-  'https://storage.googleapis.com/mycommerce/mfes/checkout-ui/style-BlJ0dWaw.css';
+  'https://storage.googleapis.com/mycommerce/mfes/checkout-ui/style-CNDSqNPK.css';
 
-export function FederatedServerCheckout({
+export async function FederatedServerCheckout({
   cartId = 'cart_active_session',
 }: FederatedServerCheckoutProps = {}) {
   const localFallbackPath = path.resolve(

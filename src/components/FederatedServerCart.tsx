@@ -18,9 +18,9 @@ const SSR_MFE_URL =
 
 const CSS_MFE_URL =
   process.env.MFE_CART_CSS_URL ||
-  'https://storage.googleapis.com/mycommerce/mfes/cart-ui/style-Cw94VWu7.css';
+  'https://storage.googleapis.com/mycommerce/mfes/cart-ui/style-DPFlrg2-.css';
 
-export function FederatedServerCart({
+export async function FederatedServerCart({
   cartId = 'cart_active_session',
 }: FederatedServerCartProps = {}) {
   const localFallbackPath = path.resolve(

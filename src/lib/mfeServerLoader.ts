@@ -146,9 +146,9 @@ export async function loadMfeServerModule({
         return null;
       }
 
-      // 2. Remote HTTP fetch
+      // 2. Remote HTTP fetch with 15s timeout for resilient cold-start fetching
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000);
+      const timeoutId = setTimeout(() => controller.abort(), 15000);
 
       const response = await fetch(url, {
         signal: controller.signal,
@@ -169,10 +169,17 @@ export async function loadMfeServerModule({
       }
 
       const hash = crypto.createHash('sha256').update(code).digest('hex').slice(0, 12);
-      const filePath = path.join(cacheDir, `${safeName}-${hash}.mjs`);
+      let filePath = path.join(cacheDir, `${safeName}-${hash}.mjs`);
 
       if (!fs.existsSync(filePath)) {
-        fs.writeFileSync(filePath, code, 'utf-8');
+        try {
+          fs.writeFileSync(filePath, code, 'utf-8');
+        } catch (writeErr) {
+          console.warn(`[mfeServerLoader] writeFileSync failed for ${filePath}, falling back to os.tmpdir():`, writeErr);
+          const fallbackPath = path.join(os.tmpdir(), `${safeName}-${hash}.mjs`);
+          fs.writeFileSync(fallbackPath, code, 'utf-8');
+          filePath = fallbackPath;
+        }
       }
 
       const fileUrl = pathToFileURL(filePath).href;
@@ -181,7 +188,7 @@ export async function loadMfeServerModule({
       inMemoryModuleCache.set(cacheKey, { module: remoteModule, cachedAt: now });
       return remoteModule;
     } catch (err: any) {
-      console.warn(`[mfeServerLoader] Failed loading SSR module for "${moduleName}":`, err?.message || err);
+      console.error(`[mfeServerLoader] Failed loading SSR module for "${moduleName}":`, err?.stack || err?.message || err);
       return null;
     } finally {
       inFlightPromises.delete(cacheKey);
